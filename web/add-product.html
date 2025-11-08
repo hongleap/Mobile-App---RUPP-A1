@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Product - Firebase</title>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+    <script src="config.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #555;
+            font-weight: 600;
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .checkbox-group input {
+            width: auto;
+        }
+        .color-input-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .color-item {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            border: 2px solid #ddd;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        button:hover {
+            transform: translateY(-2px);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .add-color-btn, .remove-color-btn {
+            width: auto;
+            padding: 8px 15px;
+            font-size: 14px;
+            background: #28a745;
+            margin: 0;
+        }
+        .remove-color-btn {
+            background: #dc3545;
+        }
+        .sizes-input {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .size-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 8px 15px;
+            background: #f0f0f0;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+        .size-tag button {
+            width: 20px;
+            height: 20px;
+            padding: 0;
+            background: #dc3545;
+            border-radius: 50%;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>➕ Add Product to Firebase</h1>
+        <form id="productForm">
+            <div class="form-group">
+                <label>Product Name *</label>
+                <input type="text" id="name" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Price *</label>
+                <input type="number" id="price" step="0.01" required>
+            </div>
+            
+            <div class="form-group">
+                <label>Category *</label>
+                <select id="category" required>
+                    <option value="">Select Category</option>
+                    <option value="Hoodies">Hoodies</option>
+                    <option value="Jackets">Jackets</option>
+                    <option value="T-Shirts">T-Shirts</option>
+                    <option value="Pants">Pants</option>
+                    <option value="Shoes">Shoes</option>
+                    <option value="Accessories">Accessories</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Gender</label>
+                <select id="gender">
+                    <option value="">Select Gender</option>
+                    <option value="Men">Men</option>
+                    <option value="Women">Women</option>
+                    <option value="Kids">Kids</option>
+                    <option value="Unisex">Unisex</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label>Description</label>
+                <textarea id="description" placeholder="Product description..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Product Images * (Upload from device)</label>
+                <input type="file" id="imageInput" multiple accept="image/*" required style="margin-bottom: 10px; padding: 10px; border: 2px dashed #667eea; border-radius: 8px; background: #f8f9ff; cursor: pointer;">
+                <div id="imagePreview" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 10px; margin-bottom: 10px;"></div>
+                <small style="color: #666; display: block; margin-top: 10px;">Or optionally add image URLs (one per line):</small>
+                <textarea id="images" placeholder="https://example.com/image1.jpg&#10;https://example.com/image2.jpg" style="margin-top: 5px; font-size: 14px;"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label>Sizes (comma separated)</label>
+                <input type="text" id="sizes" placeholder="S, M, L, XL, 2XL">
+            </div>
+            
+            <div class="form-group">
+                <label>Colors</label>
+                <div id="colorsContainer"></div>
+                <button type="button" class="add-color-btn" onclick="addColorField()">+ Add Color</button>
+            </div>
+            
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="onSale">
+                <label for="onSale">On Sale</label>
+            </div>
+            
+            <div class="form-group checkbox-group">
+                <input type="checkbox" id="freeShipping">
+                <label for="freeShipping">Free Shipping</label>
+            </div>
+            
+            <div class="form-group">
+                <label>Stock Quantity</label>
+                <input type="number" id="stock" min="0" value="0" required>
+                <small style="color: #666; display: block; margin-top: 5px;">Enter the number of items in stock</small>
+            </div>
+            
+            <button type="submit" id="submitBtn">Add Product</button>
+        </form>
+        
+        <div id="message"></div>
+    </div>
+
+    <script>
+        // Firebase configuration is loaded from config.js
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        let colorCount = 0;
+        let selectedFiles = [];
+        let uploadedImageUrls = [];
+
+        // Image preview with better styling
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            selectedFiles = files;
+            const preview = document.getElementById('imagePreview');
+            preview.innerHTML = '';
+            
+            if (files.length === 0) {
+                preview.innerHTML = '<p style="color: #999; text-align: center; padding: 20px;">No images selected</p>';
+                return;
+            }
+            
+            files.forEach((file, index) => {
+                // Validate file type
+                if (!file.type.startsWith('image/')) {
+                    alert(`File ${file.name} is not an image. Skipping...`);
+                    return;
+                }
+                
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    alert(`File ${file.name} is too large (max 5MB). Skipping...`);
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const div = document.createElement('div');
+                    div.style.position = 'relative';
+                    div.style.background = '#fff';
+                    div.style.border = '2px solid #ddd';
+                    div.style.borderRadius = '8px';
+                    div.style.padding = '5px';
+                    div.innerHTML = `
+                        <img src="${e.target.result}" style="width: 100%; height: 120px; object-fit: cover; border-radius: 5px;">
+                        <div style="position: absolute; top: 8px; right: 8px; background: rgba(220, 53, 69, 0.9); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; font-weight: bold;" onclick="removeImage(${index})" title="Remove image">×</div>
+                        <div style="margin-top: 5px; font-size: 11px; color: #666; text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;" title="${file.name}">${file.name.length > 15 ? file.name.substring(0, 15) + '...' : file.name}</div>
+                        <div style="font-size: 10px; color: #999; text-align: center;">${(file.size / 1024).toFixed(1)} KB</div>
+                    `;
+                    preview.appendChild(div);
+                };
+                reader.onerror = function() {
+                    alert(`Error reading file: ${file.name}`);
+                };
+                reader.readAsDataURL(file);
+            });
+        });
+
+        function removeImage(index) {
+            if (confirm('Remove this image?')) {
+                selectedFiles.splice(index, 1);
+                const input = document.getElementById('imageInput');
+                const dt = new DataTransfer();
+                selectedFiles.forEach(file => dt.items.add(file));
+                input.files = dt.files;
+                input.dispatchEvent(new Event('change'));
+            }
+        }
+
+        async function uploadImages(files) {
+            uploadedImageUrls = [];
+            const uploadPromises = [];
+            
+            // Show upload progress
+            const messageDiv = document.getElementById('message');
+            let uploadedCount = 0;
+            
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                // Clean filename - remove special characters
+                const cleanFileName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+                const fileName = `products/${Date.now()}_${i}_${cleanFileName}`;
+                const storageRef = storage.ref().child(fileName);
+                
+                const uploadPromise = storageRef.put(file).then(snapshot => {
+                    uploadedCount++;
+                    messageDiv.className = 'message success';
+                    messageDiv.textContent = `Uploading images... ${uploadedCount}/${files.length}`;
+                    return snapshot.ref.getDownloadURL();
+                }).then(url => {
+                    uploadedImageUrls.push(url);
+                    return url;
+                }).catch(error => {
+                    console.error('Error uploading image:', error);
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = `Error uploading ${file.name}: ${error.message}`;
+                    throw error;
+                });
+                
+                uploadPromises.push(uploadPromise);
+            }
+            
+            await Promise.all(uploadPromises);
+            messageDiv.innerHTML = '';
+            return uploadedImageUrls;
+        }
+
+        function addColorField() {
+            const container = document.getElementById('colorsContainer');
+            const div = document.createElement('div');
+            div.className = 'color-item';
+            div.id = `color-${colorCount}`;
+            div.innerHTML = `
+                <input type="text" placeholder="Color Name" class="color-name" style="flex: 1;">
+                <input type="color" class="color-value" value="#000000">
+                <div class="color-preview" style="background-color: #000000;"></div>
+                <button type="button" class="remove-color-btn" onclick="removeColorField('color-${colorCount}')">×</button>
+            `;
+            container.appendChild(div);
+            
+            // Update preview when color changes
+            const colorInput = div.querySelector('.color-value');
+            const preview = div.querySelector('.color-preview');
+            colorInput.addEventListener('input', (e) => {
+                preview.style.backgroundColor = e.target.value;
+            });
+            
+            colorCount++;
+        }
+
+        function removeColorField(id) {
+            document.getElementById(id).remove();
+        }
+
+        document.getElementById('productForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const submitBtn = document.getElementById('submitBtn');
+            const messageDiv = document.getElementById('message');
+            
+            submitBtn.disabled = true;
+            messageDiv.innerHTML = '';
+            
+            try {
+                // Check if images are provided
+                if (selectedFiles.length === 0) {
+                    const imagesText = document.getElementById('images').value.trim();
+                    if (!imagesText) {
+                        messageDiv.className = 'message error';
+                        messageDiv.textContent = '❌ Please upload at least one image or provide image URLs';
+                        submitBtn.disabled = false;
+                        return;
+                    }
+                }
+                
+                submitBtn.textContent = 'Uploading images...';
+                submitBtn.disabled = true;
+                
+                // Upload images from device first (primary method)
+                let images = [];
+                if (selectedFiles.length > 0) {
+                    images = await uploadImages(selectedFiles);
+                }
+                
+                // Also add URLs if provided (optional)
+                const imagesText = document.getElementById('images').value;
+                if (imagesText.trim()) {
+                    const urls = imagesText.split('\n')
+                        .map(url => url.trim())
+                        .filter(url => url.length > 0);
+                    images = [...images, ...urls];
+                }
+                
+                if (images.length === 0) {
+                    messageDiv.className = 'message error';
+                    messageDiv.textContent = '❌ No images were uploaded. Please try again.';
+                    submitBtn.disabled = false;
+                    return;
+                }
+                
+                submitBtn.textContent = 'Adding product...';
+                
+                // Get form values
+                const name = document.getElementById('name').value;
+                const price = parseFloat(document.getElementById('price').value);
+                const category = document.getElementById('category').value;
+                const gender = document.getElementById('gender').value;
+                const description = document.getElementById('description').value;
+                const sizesText = document.getElementById('sizes').value;
+                const onSale = document.getElementById('onSale').checked;
+                const freeShipping = document.getElementById('freeShipping').checked;
+                const stock = parseInt(document.getElementById('stock').value) || 0;
+                
+                // Process sizes
+                const sizes = sizesText.split(',')
+                    .map(size => size.trim())
+                    .filter(size => size.length > 0);
+                
+                // Process colors
+                const colors = [];
+                document.querySelectorAll('.color-item').forEach(item => {
+                    const name = item.querySelector('.color-name').value;
+                    const value = item.querySelector('.color-value').value;
+                    if (name && value) {
+                        colors.push({
+                            name: name,
+                            colorValue: value
+                        });
+                    }
+                });
+                
+                // Create product data
+                const productData = {
+                    name: name,
+                    price: price,
+                    priceString: `$${price.toFixed(2)}`,
+                    category: category,
+                    description: description || '',
+                    images: images,
+                    sizes: sizes.length > 0 ? sizes : ['S', 'M', 'L', 'XL', '2XL'],
+                    colors: colors,
+                    onSale: onSale,
+                    freeShipping: freeShipping,
+                    gender: gender || '',
+                    stock: stock,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                // Add to Firestore
+                await db.collection('products').add(productData);
+                
+                // Success message
+                messageDiv.className = 'message success';
+                messageDiv.textContent = '✅ Product added successfully!';
+                
+                // Reset form
+                document.getElementById('productForm').reset();
+                document.getElementById('colorsContainer').innerHTML = '';
+                document.getElementById('imagePreview').innerHTML = '';
+                selectedFiles = [];
+                colorCount = 0;
+                
+            } catch (error) {
+                console.error('Error adding product:', error);
+                messageDiv.className = 'message error';
+                messageDiv.textContent = '❌ Error: ' + error.message;
+            } finally {
+                submitBtn.disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
+
