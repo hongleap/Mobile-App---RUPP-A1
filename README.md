@@ -4,10 +4,20 @@ A modern e-commerce mobile application built with Android Jetpack Compose and Fi
 
 ## 📋 Prerequisites
 
+**Required Software:**
 - Android Studio (latest version)
 - JDK 17 or higher
+- Kotlin (included with Android Studio)
+- Android SDK (installed via Android Studio)
+
+**Accounts & Keys:**
 - Firebase account
-- Gemini API key (for AI chatbot feature)
+- Gemini API key (for AI chatbot feature) - Get from: https://makersuite.google.com/app/apikey
+
+**Knowledge:**
+- Basic Android development
+- Kotlin programming
+- Jetpack Compose (for UI)
 
 ## 🚀 Setup Instructions
 
