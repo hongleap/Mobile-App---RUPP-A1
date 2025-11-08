@@ -14,7 +14,7 @@ A modern e-commerce mobile application built with Android Jetpack Compose and Fi
 ### 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
+git clone https://github.com/hongleap/Mobile-App---RUPP-A1.git
 cd APP
 ```
 
