@@ -1,3 +1,8 @@
+# Backend (from main)
+backend/
+spring-boot-backend.zip
+
+# Android Studio / IntelliJ
 *.iml
 .gradle
 /local.properties
