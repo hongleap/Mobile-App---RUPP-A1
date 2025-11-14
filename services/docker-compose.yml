@@ -1,0 +1,68 @@
+services:
+  api-gateway:
+    build:
+      context: .
+      dockerfile: ./api-gateway/Dockerfile
+    ports:
+      - "9090:8080"  # Changed external port from 8080 to 9090
+    environment:
+      - PRODUCT_SERVICE_URL=http://product-service:8081
+      - ORDER_SERVICE_URL=http://order-service:8082
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8083
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+    depends_on:
+      - product-service
+      - order-service
+      - notification-service
+    networks:
+      - microservices-network
+
+  product-service:
+    build:
+      context: .
+      dockerfile: ./product-service/Dockerfile
+    ports:
+      - "9091:8081"  # Changed external port from 8081 to 9091
+    environment:
+      - FIRESTORE_PROJECT_ID=${FIRESTORE_PROJECT_ID:-your-project-id}
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+    networks:
+      - microservices-network
+
+  order-service:
+    build:
+      context: .
+      dockerfile: ./order-service/Dockerfile
+    ports:
+      - "9092:8082"  # Changed external port from 8082 to 9092
+    environment:
+      - FIRESTORE_PROJECT_ID=${FIRESTORE_PROJECT_ID:-your-project-id}
+      - PRODUCT_SERVICE_URL=http://product-service:8081
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8083
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+    depends_on:
+      - product-service
+      - notification-service
+    networks:
+      - microservices-network
+
+  notification-service:
+    build:
+      context: .
+      dockerfile: ./notification-service/Dockerfile
+    ports:
+      - "9093:8083"  # Changed external port from 8083 to 9093
+    environment:
+      - FIRESTORE_PROJECT_ID=${FIRESTORE_PROJECT_ID:-your-project-id}
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+    networks:
+      - microservices-network
+
+networks:
+  microservices-network:
+    driver: bridge
+

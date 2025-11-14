@@ -1,0 +1,48 @@
+# Gradle
+build/
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+.gradletasknamecache
+
+# IDE
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+
+# Build
+*.class
+*.jar
+*.war
+*.ear
+*.apk
+*.aar
+*.ap_
+*.dex
+*.class
+bin/
+gen/
+out/
+build/
+release/
+
+# Firebase
+firebase-service-account.json
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Environment
+.env
+.env.local
+
+# Docker
+.dockerignore
+
