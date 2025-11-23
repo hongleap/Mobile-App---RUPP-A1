@@ -21,6 +21,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -41,11 +43,15 @@ fun CheckoutScreen(
     tax: Double = 0.0,
     shippingAddress: String? = null,
     paymentMethod: String? = null,
+    selectedPaymentType: String? = null, // "card", "token", "bank"
+    isPaymentVerified: Boolean = true, // Whether token payment is verified
     onBackClick: () -> Unit = {},
     onShippingAddressClick: () -> Unit = {},
     onPaymentMethodClick: () -> Unit = {},
+    onTokenPaymentClick: () -> Unit = {},
     onBankClick: () -> Unit = {},
-    onPlaceOrder: () -> Unit = {}
+    onPlaceOrder: () -> Unit = {},
+    onVerifyClick: () -> Unit = {}
 ) {
     val total = subtotal + shippingCost + tax
     val scrollState = rememberScrollState()
@@ -108,6 +114,62 @@ fun CheckoutScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Token Payment Section
+            TokenPaymentSection(
+                isSelected = selectedPaymentType == "token",
+                onClick = onTokenPaymentClick
+            )
+            
+            // Payment verification status for token payments
+            if (selectedPaymentType == "token") {
+                Spacer(modifier = Modifier.height(8.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = if (isPaymentVerified) 
+                            Color(0xFFE8F5E9) 
+                        else 
+                            Color(0xFFFFF3E0)
+                    )
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(12.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        Text(
+                            text = if (isPaymentVerified) "✓" else "⚠",
+                            fontSize = 20.sp,
+                            color = if (isPaymentVerified) Color(0xFF4CAF50) else Color(0xFFFF9800)
+                        )
+                        Text(
+                            text = if (isPaymentVerified) 
+                                "Token payment verified. You can place your order." 
+                            else 
+                                "Please complete token payment in MetaMask first.",
+                            fontSize = 12.sp,
+                            color = if (isPaymentVerified) Color(0xFF2E7D32) else Color(0xFFE65100),
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        if (!isPaymentVerified) {
+                            TextButton(
+                                onClick = onVerifyClick,
+                                colors = ButtonDefaults.textButtonColors(
+                                    contentColor = Color(0xFFE65100)
+                                )
+                            ) {
+                                Text("Check Status", fontWeight = FontWeight.Bold)
+                            }
+                        }
+                    }
+                }
+            }
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             // Bank Section
             BankSection(
                 onClick = onBankClick
@@ -129,6 +191,8 @@ fun CheckoutScreen(
         // Bottom bar with total and Place Order button
         BottomActionBar(
             total = total,
+            isPaymentVerified = isPaymentVerified,
+            selectedPaymentType = selectedPaymentType,
             onPlaceOrder = onPlaceOrder
         )
     }
@@ -254,6 +318,68 @@ private fun PaymentMethodSection(
             Icon(
                 imageVector = Icons.Default.KeyboardArrowRight,
                 contentDescription = "Edit",
+                tint = Color(0xFF262626)
+            )
+        }
+    }
+}
+
+@Composable
+private fun TokenPaymentSection(
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(12.dp))
+            .clickable(onClick = onClick),
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) Color(0xFFE3F2FD) else Color(0xFFF0F0F0)
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 2.dp else 1.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(24.dp)
+                        .clip(RoundedCornerShape(4.dp))
+                        .background(Color(0xFFF7931E)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = "🪙",
+                        fontSize = 16.sp
+                    )
+                }
+                Column {
+                    Text(
+                        text = "Token Payment",
+                        fontSize = 12.sp,
+                        color = Color(0xFF999999)
+                    )
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Pay with ${com.example.app.blockchain.config.TokenConfig.TOKEN_SYMBOL}",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF262626)
+                    )
+                }
+            }
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "Select Token Payment",
                 tint = Color(0xFF262626)
             )
         }
@@ -398,6 +524,8 @@ private fun OrderSummarySection(
 @Composable
 private fun BottomActionBar(
     total: Double,
+    isPaymentVerified: Boolean = true,
+    selectedPaymentType: String? = null,
     onPlaceOrder: () -> Unit
 ) {
     Card(
@@ -420,14 +548,27 @@ private fun BottomActionBar(
                 fontWeight = FontWeight.Bold,
                 color = Color.White
             )
+            val isButtonEnabled = selectedPaymentType != null && (selectedPaymentType != "token" || isPaymentVerified)
+            
             Card(
                 modifier = Modifier
                     .clip(RoundedCornerShape(12.dp))
-                    .clickable(onClick = onPlaceOrder),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF4CAF50))
+                    .then(
+                        if (isButtonEnabled) {
+                            Modifier.clickable(onClick = onPlaceOrder)
+                        } else {
+                            Modifier
+                        }
+                    ),
+                colors = CardDefaults.cardColors(
+                    containerColor = if (isButtonEnabled) Color(0xFF4CAF50) else Color(0xFF9E9E9E)
+                )
             ) {
                 Text(
-                    text = "Place Order",
+                    text = if (selectedPaymentType == "token" && !isPaymentVerified) 
+                        "Complete Payment First" 
+                    else 
+                        "Place Order",
                     modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,

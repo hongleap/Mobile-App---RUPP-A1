@@ -59,6 +59,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.app.R
+import com.example.app.blockchain.WalletManager
+import com.example.app.blockchain.TokenService
+import com.example.app.blockchain.config.TokenConfig
+import androidx.compose.runtime.LaunchedEffect
+import kotlinx.coroutines.launch
+import java.math.BigDecimal
 
 @Composable
 fun HomeScreen(
@@ -75,6 +81,21 @@ fun HomeScreen(
     showBottomNav: Boolean = true
 ) {
     val scrollState = rememberScrollState()
+    val context = LocalContext.current
+    var tokenBalance by remember { mutableStateOf<BigDecimal?>(null) }
+    
+    // Load token balance
+    LaunchedEffect(Unit) {
+        val walletAddress = WalletManager.getWalletAddress(context)
+        if (walletAddress != null) {
+            TokenService.getTokenBalance(walletAddress).fold(
+                onSuccess = { tokenBalance = it },
+                onFailure = { tokenBalance = BigDecimal.ZERO }
+            )
+        } else {
+            tokenBalance = BigDecimal.ZERO
+        }
+    }
     
     Column(
         modifier = Modifier
@@ -84,7 +105,10 @@ fun HomeScreen(
             .padding(horizontal = 16.dp)
     ) {
         Spacer(modifier = Modifier.height(16.dp))
-        HeaderRow(onCartClick = onCartClick)
+        HeaderRow(
+            onCartClick = onCartClick,
+            tokenBalance = tokenBalance
+        )
 
         Spacer(modifier = Modifier.height(16.dp))
         SearchBar(onSearchSubmit = onSearchSubmit, onFilterClick = onFilterClick)
@@ -149,7 +173,10 @@ fun HomeScreen(
 }
 
 @Composable
-private fun HeaderRow(onCartClick: () -> Unit = {}) {
+private fun HeaderRow(
+    onCartClick: () -> Unit = {},
+    tokenBalance: BigDecimal? = null
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -187,9 +214,11 @@ private fun HeaderRow(onCartClick: () -> Unit = {}) {
                         modifier = Modifier.size(24.dp)
                     )
                 }
-                // CToken text
+                // Token balance text
                 Text(
-                    text = "69 CToken",
+                    text = tokenBalance?.let { 
+                        "${TokenService.formatTokenAmount(it)} ${TokenConfig.TOKEN_SYMBOL}"
+                    } ?: "0 ${TokenConfig.TOKEN_SYMBOL}",
                     fontSize = 15.sp,
                     fontWeight = FontWeight.SemiBold,
                     color = Color(0xFF262626)

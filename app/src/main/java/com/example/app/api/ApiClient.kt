@@ -16,7 +16,7 @@ import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
 object ApiClient {
-    private const val BASE_URL = "http://10.0.2.2:9090" // Android emulator localhost (changed from 8080 to 9090)
+    private const val BASE_URL = "http://10.0.2.2:8080" // Android emulator localhost
     // For physical device, use your computer's IP: "http://192.168.1.XXX:8080"
     // For production, use your deployed API Gateway URL
     
@@ -85,6 +85,23 @@ object ApiClient {
             
             responseBody
         }
+    }
+    
+    /**
+     * Public method for making authenticated API requests
+     * Used by other API clients (e.g., TransactionApi)
+     */
+    suspend fun makeAuthenticatedRequest(
+        endpoint: String,
+        method: String = "GET",
+        body: String? = null
+    ): String {
+        return makeRequest(
+            url = "$BASE_URL$endpoint",
+            method = method,
+            body = body,
+            requiresAuth = true
+        )
     }
     
     // Product API

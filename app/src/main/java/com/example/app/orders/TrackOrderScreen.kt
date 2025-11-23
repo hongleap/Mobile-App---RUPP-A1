@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -46,8 +47,7 @@ data class OrderStatus(
 @Composable
 fun TrackOrderScreen(
     order: Order? = null,
-    onBackClick: () -> Unit = {},
-    onViewAllItems: () -> Unit = {}
+    onBackClick: () -> Unit = {}
 ) {
     // Generate status timeline based on order status
     val statuses = if (order != null) {
@@ -128,8 +128,7 @@ fun TrackOrderScreen(
 
         // Order Items section
         OrderItemsSection(
-            itemCount = itemCount,
-            onViewAll = onViewAllItems
+            items = order?.items ?: emptyList()
         )
 
         Spacer(modifier = Modifier.height(24.dp))
@@ -215,8 +214,7 @@ private fun OrderStatusTimeline(statuses: List<OrderStatus>) {
 
 @Composable
 private fun OrderItemsSection(
-    itemCount: Int,
-    onViewAll: () -> Unit
+    items: List<com.example.app.orders.data.OrderItem> = emptyList()
 ) {
     Column {
         Text(
@@ -233,43 +231,76 @@ private fun OrderItemsSection(
                 .clip(RoundedCornerShape(12.dp)),
             colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF))
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(16.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(Color(0xFFF0F0F0)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.ShoppingCart,
-                        contentDescription = null,
-                        modifier = Modifier.size(24.dp),
-                        tint = Color(0xFF666666)
+                if (items.isEmpty()) {
+                    Text(
+                        text = "No items in this order",
+                        fontSize = 14.sp,
+                        color = Color(0xFF999999)
                     )
+                } else {
+                    items.forEachIndexed { index, item ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Product image
+                            Box(
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                            ) {
+                                com.example.app.ui.ProductImage(
+                                    productId = item.productId,
+                                    category = item.category,
+                                    contentDescription = item.productName,
+                                    modifier = Modifier.fillMaxSize()
+                                )
+                            }
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            // Product details
+                            Column(modifier = Modifier.weight(1f)) {
+                                Text(
+                                    text = item.productName,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color(0xFF262626)
+                                )
+                                Text(
+                                    text = "Qty: ${item.quantity}",
+                                    fontSize = 12.sp,
+                                    color = Color(0xFF999999)
+                                )
+                            }
+
+                            // Price
+                            Text(
+                                text = "$${String.format("%.2f", item.price * item.quantity)}",
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF262626)
+                            )
+                        }
+
+                        // Add divider between items (except for last item)
+                        if (index < items.size - 1) {
+                            Spacer(modifier = Modifier.height(12.dp))
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .height(1.dp)
+                                    .background(Color(0xFFF0F0F0))
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                        }
+                    }
                 }
-
-                Spacer(modifier = Modifier.size(16.dp))
-
-                Text(
-                    text = "$itemCount items",
-                    fontSize = 14.sp,
-                    color = Color(0xFF262626),
-                    modifier = Modifier.weight(1f)
-                )
-
-                Text(
-                    text = "View All",
-                    fontSize = 14.sp,
-                    color = Color(0xFF262626),
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.clickable(onClick = onViewAll)
-                )
             }
         }
     }

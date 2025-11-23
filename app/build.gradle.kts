@@ -65,6 +65,8 @@ dependencies {
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.runtime:runtime")
+    // Material Icons Extended for more icon options
+    implementation("androidx.compose.material:material-icons-extended")
     implementation("androidx.activity:activity-compose:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
     
@@ -86,6 +88,14 @@ dependencies {
     
     // Coroutines
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    
+    // Web3j for blockchain integration (BNB Smart Chain)
+    // Using Android-compatible version
+    implementation("org.web3j:core:4.8.7-android")
+    
+    // Note: MetaMask integration uses deep links (no WalletConnect SDK needed)
+    // This allows opening MetaMask app for transaction approval
+    // For full WalletConnect integration, add JitPack repository and WalletConnect SDK
     
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

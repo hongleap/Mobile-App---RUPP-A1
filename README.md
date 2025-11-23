@@ -33,6 +33,13 @@ This project consists of three main components:
 - Real-time notifications
 - AI chatbot assistant (Gemini)
 - Admin dashboard (web)
+- **Blockchain Integration**:
+  - CToken (ERC-20) payment system on Sepolia testnet
+  - MetaMask wallet integration
+  - Token-based purchases
+  - Transaction history tracking
+  - Replay attack prevention
+  - Server-side transaction verification
 
 ## 🔧 Prerequisites
 
@@ -67,10 +74,11 @@ APP/
 │   └── google-services.json.example
 │
 ├── services/                     # Microservices Backend
-│   ├── api-gateway/             # API Gateway (Port 9090)
+│   ├── api-gateway/             # API Gateway (Port 8080)
 │   ├── product-service/         # Product Service (Port 9091)
 │   ├── order-service/           # Order Service (Port 9092)
 │   ├── notification-service/    # Notification Service (Port 9093)
+│   ├── transaction-service/     # Transaction Service (Port 9094)
 │   ├── shared-models/           # Shared data models
 │   ├── docker-compose.yml       # Docker configuration
 │   ├── firebase-service-account.json  # Firebase config (get from team lead)
@@ -117,10 +125,10 @@ cd APP
 2. Ensure the BASE_URL is set for local development:
    ```kotlin
    // For Android Emulator
-   private const val BASE_URL = "http://10.0.2.2:9090"
+   private const val BASE_URL = "http://10.0.2.2:8080"
    
    // For Physical Device (replace with your computer's IP)
-   // private const val BASE_URL = "http://192.168.1.XXX:9090"
+   // private const val BASE_URL = "http://192.168.1.XXX:8080"
    ```
 
    **To find your computer's IP:**
@@ -201,12 +209,13 @@ curl http://localhost:9090/api/products
 ```
 
 **Service URLs:**
-- **API Gateway**: `http://localhost:9090` ⭐ **Use this for all requests**
+- **API Gateway**: `http://localhost:8080` ⭐ **Use this for all requests**
 - Product Service: `http://localhost:9091` (direct access - debugging only)
 - Order Service: `http://localhost:9092` (direct access - debugging only)
 - Notification Service: `http://localhost:9093` (direct access - debugging only)
+- Transaction Service: `http://localhost:9094` (direct access - debugging only)
 
-⚠️ **Important**: Always use the API Gateway (port 9090) for client requests. Direct access to services bypasses authentication.
+⚠️ **Important**: Always use the API Gateway (port 8080) for client requests. Direct access to services bypasses authentication.
 
 ### 3. Web Dashboard Setup (Optional)
 
@@ -266,30 +275,41 @@ python3 -m http.server 8000
 └─────────────────────────────────────────────────────────┘
                         │
                         │ HTTP Requests
-                        │ http://10.0.2.2:9090
+                        │ http://10.0.2.2:8080
                         ▼
 ┌─────────────────────────────────────────────────────────┐
-│              API Gateway (Port 9090)                    │
+│              API Gateway (Port 8080)                    │
 │              - Receives requests from app               │
 │              - Routes to appropriate service            │
+│              - Handles authentication                   │
 └─────────────────────────────────────────────────────────┘
                         │
-        ┌───────────────┼───────────────┐
-        │               │               │
-        ▼               ▼               ▼
-┌──────────────┐  ┌──────────────┐  ┌──────────────┐
-│   Product    │  │    Order     │  │ Notification │
-│   Service    │  │   Service    │  │   Service    │
-│  (Port 9091) │  │  (Port 9092) │  │  (Port 9093) │
-└──────────────┘  └──────────────┘  └──────────────┘
-        │               │               │
-        └───────────────┼───────────────┘
+        ┌───────────────┼───────────────┬───────────────┐
+        │               │               │               │
+        ▼               ▼               ▼               ▼
+┌──────────────┐  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐
+│   Product    │  │    Order     │  │ Notification │  │ Transaction  │
+│   Service    │  │   Service    │  │   Service    │  │   Service    │
+│  (Port 9091) │  │  (Port 9092) │  │  (Port 9093) │  │  (Port 9094) │
+└──────────────┘  └──────────────┘  └──────────────┘  └──────────────┘
+        │               │               │               │
+        └───────────────┼───────────────┴───────────────┘
                         │
                         ▼
 ┌─────────────────────────────────────────────────────────┐
 │              Firebase (Cloud Database)                 │
 │              - Stores all data                         │
 │              - Authentication                           │
+│              - Transaction history                      │
+└─────────────────────────────────────────────────────────┘
+                        │
+                        │ (Transaction Service also connects to)
+                        ▼
+┌─────────────────────────────────────────────────────────┐
+│         Ethereum Sepolia Testnet (Blockchain)          │
+│         - CToken (ERC-20) smart contract               │
+│         - Transaction verification                      │
+│         - Immutable transaction records                 │
 └─────────────────────────────────────────────────────────┘
 ```
 
@@ -358,6 +378,36 @@ The backend uses a microservices architecture with:
 
 **Database:**
 - Firebase Firestore (NoSQL database)
+
+### Blockchain Integration
+
+**CToken Payment System:**
+- **Smart Contract**: ERC-20 token deployed on Ethereum Sepolia testnet
+- **Token Symbol**: CLOT
+- **Wallet Integration**: MetaMask for Android
+- **Network**: Sepolia Testnet (Chain ID: 11155111)
+
+**Transaction Service Features:**
+1. **Transaction Tracking**:
+   - Stores transaction hashes in Firestore (`consumed_transactions` collection)
+   - Prevents replay attacks by checking if transaction already used
+   - Validates transactions on blockchain before accepting
+
+2. **Transaction History**:
+   - Syncs transaction history across devices
+   - Stores in Firestore (`transactions` collection)
+   - Local caching for offline access
+
+3. **Payment Verification**:
+   - Verifies token transfers on blockchain
+   - Checks transaction amount and recipient
+   - Validates transaction status (confirmed/pending)
+
+**API Endpoints** (via Transaction Service):
+- `POST /api/transactions/mark-consumed` - Mark transaction as used
+- `GET /api/transactions/check/:hash` - Check if transaction consumed
+- `POST /api/transactions/save` - Save transaction to history
+- `GET /api/transactions/history` - Get user's transaction history
 
 ## 🔍 Troubleshooting
 

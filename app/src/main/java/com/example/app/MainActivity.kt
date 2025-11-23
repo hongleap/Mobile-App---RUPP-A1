@@ -29,7 +29,6 @@ import com.example.app.home.HomeScreen
 import com.example.app.login.CreateAccountScreen
 import com.example.app.login.ForgotPasswordScreen
 import com.example.app.login.Login
-import com.example.app.login.LoginPasswordScreen
 import com.example.app.login.OnboardingScreen
 import com.example.app.login.PasswordResetConfirmationScreen
 import com.example.app.auth.AuthRepository
@@ -59,8 +58,9 @@ import com.example.app.address.AddAddressScreen
 import com.example.app.wishlist.WishlistScreen
 import com.example.app.wishlist.MyFavouritesScreen
 import com.example.app.profile.ProfileScreen
-import com.example.app.redemption.RedemptionScreen
 import com.example.app.chat.ChatScreen
+import com.example.app.blockchain.WalletScreen
+import com.example.app.blockchain.TokenTransferScreen
 import com.example.app.chat.config.ApiConfig
 import com.example.app.data.ProductRepository
 import androidx.compose.runtime.LaunchedEffect
@@ -97,6 +97,8 @@ fun MainScreen() {
     // Simple in-file navigation across login-related screens
     var currentScreen by remember { mutableStateOf(if (isUserSignedIn) "home" else "login") }
     var previousScreen by remember { mutableStateOf("") }
+    var selectedPaymentType by remember { mutableStateOf<String?>(null) } // "card", "token", "bank"
+    var paymentVerified by remember { mutableStateOf(false) } // Track if token payment is verified
     var email by remember { mutableStateOf("") }
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -210,23 +212,10 @@ fun MainScreen() {
             exit = slideOutHorizontally(targetOffsetX = { -it })
         ) {
             Login(
-                onContinue = { enteredEmail ->
-            email = enteredEmail
-            currentScreen = "password"
+                onContinue = { 
+                    // Navigation handled by LaunchedEffect(isUserSignedIn) 
                 },
-                onCreateAccountClick = { currentScreen = "create_account" }
-            )
-        }
-        
-        AnimatedVisibility(
-            visible = currentScreen == "password",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
-        ) {
-            LoginPasswordScreen(
-                email = email,
-                onBackClick = { currentScreen = "login" },
-                onContinueClick = { /* Navigation handled by LaunchedEffect(isUserSignedIn) */ },
+                onCreateAccountClick = { currentScreen = "create_account" },
                 onForgotPasswordClick = { currentScreen = "forgot_password" },
                 onError = { error -> errorMessage = error }
             )
@@ -396,13 +385,13 @@ fun MainScreen() {
                             previousScreen = "profile"
                             currentScreen = "wishlist" 
                         },
-                        onRedemptionClick = { 
-                            previousScreen = "profile"
-                            currentScreen = "redemption" 
-                        },
                         onSupportClick = { 
                             previousScreen = "profile"
                             currentScreen = "chat" 
+                        },
+                        onWalletClick = { 
+                            previousScreen = "profile"
+                            currentScreen = "wallet" 
                         },
                         onEditProfileClick = { /* Handle edit profile */ },
                         onSignOutClick = { 
@@ -480,6 +469,9 @@ fun MainScreen() {
                             item
                         }
                     }
+                },
+                onRemoveItem = { itemId ->
+                    cartItems = cartItems.filter { it.id != itemId }
                 },
                 onRemoveAll = { cartItems = emptyList() },
                 onBackClick = { currentScreen = "home" },
@@ -629,12 +621,46 @@ fun MainScreen() {
                 }
             }
             
+            // Poll for payment verification when on checkout screen with token payment
+            LaunchedEffect(currentScreen, selectedPaymentType) {
+                if (currentScreen == "checkout" && selectedPaymentType == "token") {
+                    while (true) {
+                        val (isVerified, _) = com.example.app.blockchain.PaymentVerification.verifyPendingPayment(context)
+                        if (isVerified) {
+                            // Refresh UI to show verified status
+                            // We need to trigger a recomposition, so we toggle a state or just rely on the loop
+                            // But verifyPendingPayment updates SharedPreferences which is read below
+                            // To force UI update, we can update a local state if we had one exposed, 
+                            // but since we don't, we rely on the fact that verifyPendingPayment updates the underlying data
+                            // and the next check below will pick it up? No, that's not reactive.
+                            // We need to force a refresh.
+                            // Let's update the paymentVerified state we defined earlier
+                            paymentVerified = true
+                            break
+                        }
+                        kotlinx.coroutines.delay(5000) // Check every 5 seconds
+                    }
+                }
+            }
+            
+            // Check payment status for token payments
+            val isTokenPaymentVerified = if (selectedPaymentType == "token") {
+                val total = subtotal + shippingCost + tax
+                val totalAmount = java.math.BigDecimal(total.toString())
+                // Check both the reactive state and the persistent storage
+                paymentVerified || com.example.app.blockchain.PaymentVerification.isPaymentVerified(context, totalAmount)
+            } else {
+                true // Non-token payments don't need verification
+            }
+            
             CheckoutScreen(
                 subtotal = subtotal,
                 shippingCost = shippingCost,
                 tax = tax,
                 shippingAddress = shippingAddress,
                 paymentMethod = paymentMethod,
+                selectedPaymentType = selectedPaymentType,
+                isPaymentVerified = isTokenPaymentVerified,
                 onBackClick = { currentScreen = "cart" },
                 onShippingAddressClick = { 
                     previousScreen = "checkout"
@@ -644,8 +670,41 @@ fun MainScreen() {
                     previousScreen = "checkout"
                     currentScreen = "payment_method" 
                 },
-                onBankClick = { currentScreen = "qrcode" },
-                onPlaceOrder = {
+                onTokenPaymentClick = { 
+                    selectedPaymentType = "token"
+                    // Navigate to token payment/transfer screen
+                    previousScreen = "checkout"
+                    currentScreen = "token_transfer" 
+                },
+                onVerifyClick = {
+                    scope.launch {
+                        val (isVerified, debugMsg) = com.example.app.blockchain.PaymentVerification.verifyPendingPayment(context)
+                        if (isVerified) {
+                            paymentVerified = true
+                            android.widget.Toast.makeText(context, "Payment Verified!", android.widget.Toast.LENGTH_SHORT).show()
+                        } else {
+                            android.widget.Toast.makeText(context, "Not Verified: $debugMsg", android.widget.Toast.LENGTH_LONG).show()
+                        }
+                    }
+                },
+                onBankClick = { 
+                    selectedPaymentType = "bank"
+                    currentScreen = "qrcode" 
+                },
+                onPlaceOrder = onPlaceOrder@{
+                    // Verify payment if using token payment
+                    if (selectedPaymentType == "token") {
+                        val total = subtotal + shippingCost + tax
+                        val totalAmount = java.math.BigDecimal(total.toString())
+                        
+                        // Check both the reactive state and the persistent storage
+                        if (!paymentVerified && !com.example.app.blockchain.PaymentVerification.isPaymentVerified(context, totalAmount)) {
+                            // Payment not verified - show error
+                            errorMessage = "Please complete the token payment first. The transaction must be approved in MetaMask before placing the order."
+                            return@onPlaceOrder
+                        }
+                    }
+                    
                     scope.launch {
                         // Create order from cart items
                         val orderItems = cartItems.map { item ->
@@ -655,7 +714,8 @@ fun MainScreen() {
                                 quantity = item.quantity,
                                 price = item.price,
                                 size = item.size,
-                                color = item.color
+                                color = item.color,
+                                category = item.category
                             )
                         }
                         val subtotal = cartItems.sumOf { it.price * it.quantity }
@@ -687,6 +747,22 @@ fun MainScreen() {
                         )
                         
                         orderResult.onSuccess { orderId ->
+                            // Mark transaction as consumed and clear payment verification after successful order
+                            if (selectedPaymentType == "token") {
+                                scope.launch {
+                                    // Get the transaction hash and amount before clearing
+                                    val txHash = com.example.app.blockchain.PaymentVerification.getPendingPaymentHash(context)
+                                    if (txHash != null) {
+                                        val total = subtotal + shippingCost + tax
+                                        val totalAmount = java.math.BigDecimal(total.toString())
+                                        // Mark as consumed to prevent reuse (saves to both local and server)
+                                        com.example.app.blockchain.PaymentVerification.markTransactionAsConsumed(context, txHash, totalAmount)
+                                    }
+                                    com.example.app.blockchain.PaymentVerification.clearPendingPayment(context)
+                                    paymentVerified = false
+                                }
+                            }
+                            
                             // Decrease stock for all products in the order
                             val stockResult = StockRepository.decreaseStockForOrder(orderItems)
                             stockResult.onFailure {
@@ -874,21 +950,19 @@ fun MainScreen() {
             )
         }
         
-        // Redemption Screen
+        // Wallet Screen
         AnimatedVisibility(
-            visible = currentScreen == "redemption",
+            visible = currentScreen == "wallet",
             enter = slideInHorizontally(initialOffsetX = { it }),
             exit = slideOutHorizontally(targetOffsetX = { it })
         ) {
-            RedemptionScreen(
-                balance = 10000,
+            WalletScreen(
                 onBackClick = { 
-                    currentScreen = if (previousScreen == "profile") "profile" else "home"
+                    currentScreen = if (previousScreen == "profile") "profile" else "profile"
                 },
-                onProductClick = { /* Handle product click */ },
-                onRedeemClick = { productId ->
-                    /* Handle redemption */
-                    // Deduct CToken and add product to cart/orders
+                onTransferClick = {
+                    previousScreen = "wallet"
+                    currentScreen = "token_transfer"
                 }
             )
         }
@@ -904,6 +978,68 @@ fun MainScreen() {
                     currentScreen = if (previousScreen == "profile") "profile" else "home"
                 },
                 apiKey = ApiConfig.GEMINI_API_KEY
+            )
+        }
+        
+        // Token Transfer Screen
+        AnimatedVisibility(
+            visible = currentScreen == "token_transfer",
+            enter = slideInHorizontally(initialOffsetX = { it }),
+            exit = slideOutHorizontally(targetOffsetX = { it })
+        ) {
+            val context = LocalContext.current
+            val walletAddress = com.example.app.blockchain.WalletManager.getWalletAddress(context)
+            val totalAmount = if (previousScreen == "checkout") {
+                val subtotal = cartItems.sumOf { it.price * it.quantity }
+                val shippingCost = 8.0
+                val tax = 0.0
+                java.math.BigDecimal((subtotal + shippingCost + tax).toString()).setScale(2, java.math.RoundingMode.HALF_UP)
+            } else null
+            
+            TokenTransferScreen(
+                recipientAddress = if (previousScreen == "checkout") {
+                    com.example.app.blockchain.config.TokenConfig.STORE_WALLET_ADDRESS
+                } else "",
+                amount = totalAmount,
+                onBackClick = { 
+                    currentScreen = if (previousScreen == "wallet") "wallet" 
+                    else if (previousScreen == "checkout") "checkout" 
+                    else "home"
+                },
+                onTransferComplete = { txHash ->
+                    // If coming from checkout, mark payment as pending
+                    if (previousScreen == "checkout") {
+                        // Use context from outer composable scope (line 979)
+                        val subtotal = cartItems.sumOf { it.price * it.quantity }
+                        val shippingCost = 8.0
+                        val tax = 0.0
+                        val total = subtotal + shippingCost + tax
+                        val totalAmount = java.math.BigDecimal(total.toString())
+                        
+                        // Mark payment as pending (will be verified when MetaMask confirms)
+                        val fromAddress = com.example.app.blockchain.WalletManager.getWalletAddress(context) ?: ""
+                        com.example.app.blockchain.PaymentVerification.setPendingPayment(
+                            context = context,
+                            transactionHash = txHash,
+                            amount = totalAmount,
+                            recipientAddress = com.example.app.blockchain.config.TokenConfig.STORE_WALLET_ADDRESS,
+                            fromAddress = fromAddress
+                        )
+                        
+                        // If we have a real transaction hash, mark as verified
+                        if (txHash.startsWith("0x") && txHash.length > 10) {
+                            com.example.app.blockchain.PaymentVerification.markPaymentAsVerified(context, txHash)
+                            paymentVerified = true
+                        }
+                        
+                        selectedPaymentType = "token"
+                        // Navigate back to checkout - user can now place order
+                        currentScreen = "checkout"
+                    } else {
+                        // Just go back
+                        currentScreen = if (previousScreen == "wallet") "wallet" else "home"
+                    }
+                }
             )
         }
         

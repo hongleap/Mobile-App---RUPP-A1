@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="app">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2025-11-06T09:49:22.032976442Z">
+        <DropdownSelection timestamp="2025-11-16T09:44:52.326478418Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="LocalEmulator" identifier="path=/home/piseth/.android/avd/Medium_Phone.avd" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=GML7US5PGM4SY98S" />
             </handle>
           </Target>
         </DropdownSelection>

@@ -82,6 +82,7 @@ fun Application.module() {
     val productServiceUrl = System.getenv("PRODUCT_SERVICE_URL") ?: "http://localhost:8081"
     val orderServiceUrl = System.getenv("ORDER_SERVICE_URL") ?: "http://localhost:8082"
     val notificationServiceUrl = System.getenv("NOTIFICATION_SERVICE_URL") ?: "http://localhost:8083"
+    val transactionServiceUrl = System.getenv("TRANSACTION_SERVICE_URL") ?: "http://localhost:8084"
     
     // Middleware to verify Firebase token and extract user ID
     suspend fun verifyToken(call: ApplicationCall): String? {
@@ -336,6 +337,136 @@ fun Application.module() {
                     call.respond(
                         HttpStatusCode.ServiceUnavailable,
                         mapOf("success" to false, "error" to "Notification service unavailable")
+                    )
+                }
+            }
+        }
+        
+        // Transaction Service Routes
+        route("/api/transactions") {
+            post("/mark-consumed") {
+                val userId = verifyToken(call)
+                    ?: return@post call.respond(
+                        HttpStatusCode.Unauthorized,
+                        mapOf("success" to false, "error" to "Unauthorized")
+                    )
+                
+                val body = call.receive<String>()
+                try {
+                    val response = httpClient.post("$transactionServiceUrl/api/transactions/mark-consumed") {
+                        header("X-User-Id", userId)
+                        header(HttpHeaders.ContentType, ContentType.Application.Json)
+                        setBody(body)
+                    }
+                    val responseBody = response.body<String>()
+                    call.respond(
+                        response.status,
+                        responseBody
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        mapOf("success" to false, "error" to "Transaction service unavailable")
+                    )
+                }
+            }
+            
+            get("/is-consumed/{txHash}") {
+                val userId = verifyToken(call)
+                    ?: return@get call.respond(
+                        HttpStatusCode.Unauthorized,
+                        mapOf("success" to false, "error" to "Unauthorized")
+                    )
+                
+                val txHash = call.parameters["txHash"]
+                try {
+                    val response = httpClient.get("$transactionServiceUrl/api/transactions/is-consumed/$txHash") {
+                        header("X-User-Id", userId)
+                    }
+                    val body = response.body<String>()
+                    call.respond(
+                        response.status,
+                        body
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        mapOf("success" to false, "error" to "Transaction service unavailable")
+                    )
+                }
+            }
+            
+            get("/user-transactions") {
+                val userId = verifyToken(call)
+                    ?: return@get call.respond(
+                        HttpStatusCode.Unauthorized,
+                        mapOf("success" to false, "error" to "Unauthorized")
+                    )
+                
+                try {
+                    val response = httpClient.get("$transactionServiceUrl/api/transactions/user-transactions") {
+                        header("X-User-Id", userId)
+                    }
+                    val body = response.body<String>()
+                    call.respond(
+                        response.status,
+                        body
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        mapOf("success" to false, "error" to "Transaction service unavailable")
+                    )
+                }
+            }
+            
+            post("/save") {
+                val userId = verifyToken(call)
+                    ?: return@post call.respond(
+                        HttpStatusCode.Unauthorized,
+                        mapOf("success" to false, "error" to "Unauthorized")
+                    )
+                
+                val body = call.receive<String>()
+                try {
+                    val response = httpClient.post("$transactionServiceUrl/api/transactions/save") {
+                        header("X-User-Id", userId)
+                        header(HttpHeaders.ContentType, ContentType.Application.Json)
+                        setBody(body)
+                    }
+                    val responseBody = response.body<String>()
+                    call.respond(
+                        response.status,
+                        responseBody
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        mapOf("success" to false, "error" to "Transaction service unavailable")
+                    )
+                }
+            }
+            
+            get("/history") {
+                val userId = verifyToken(call)
+                    ?: return@get call.respond(
+                        HttpStatusCode.Unauthorized,
+                        mapOf("success" to false, "error" to "Unauthorized")
+                    )
+                
+                try {
+                    val response = httpClient.get("$transactionServiceUrl/api/transactions/history") {
+                        header("X-User-Id", userId)
+                    }
+                    val body = response.body<String>()
+                    call.respond(
+                        response.status,
+                        body
+                    )
+                } catch (e: Exception) {
+                    call.respond(
+                        HttpStatusCode.ServiceUnavailable,
+                        mapOf("success" to false, "error" to "Transaction service unavailable")
                     )
                 }
             }

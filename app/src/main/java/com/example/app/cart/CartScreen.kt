@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.KeyboardArrowRight
@@ -52,7 +53,8 @@ data class CartItem(
     val price: Double,
     val quantity: Int = 1,
     val size: String = "",
-    val color: String = ""
+    val color: String = "",
+    val category: String = ""
 )
 
 @Composable
@@ -61,6 +63,7 @@ fun CartScreen(
     onExploreCategories: () -> Unit = {},
     onCheckout: () -> Unit = {},
     onQuantityChange: (String, Int) -> Unit = { _, _ -> },
+    onRemoveItem: (String) -> Unit = { _ -> },
     onRemoveAll: () -> Unit = {},
     onBackClick: () -> Unit = {},
     showBottomNav: Boolean = true
@@ -115,6 +118,7 @@ fun CartScreen(
                 items = cartItems,
                 onCheckout = onCheckout,
                 onQuantityChange = onQuantityChange,
+                onRemoveItem = onRemoveItem,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -191,6 +195,7 @@ private fun CartItemsList(
     items: List<CartItem>,
     onCheckout: () -> Unit,
     onQuantityChange: (String, Int) -> Unit,
+    onRemoveItem: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
@@ -211,6 +216,9 @@ private fun CartItemsList(
                 item = item,
                 onQuantityChange = { newQuantity ->
                     onQuantityChange(item.id, newQuantity)
+                },
+                onRemoveItem = {
+                    onRemoveItem(item.id)
                 }
             )
             Spacer(modifier = Modifier.height(12.dp))
@@ -246,7 +254,8 @@ private fun CartItemsList(
 @Composable
 private fun CartItemRow(
     item: CartItem,
-    onQuantityChange: (Int) -> Unit
+    onQuantityChange: (Int) -> Unit,
+    onRemoveItem: () -> Unit
 ) {
     var quantity by remember { mutableStateOf(item.quantity) }
 
@@ -304,11 +313,30 @@ private fun CartItemRow(
                 )
             }
 
-            // Quantity controls - vertical layout
+            // Quantity controls and delete button - vertical layout
             Column(
                 horizontalAlignment = Alignment.End,
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
+                // Delete button
+                IconButton(
+                    onClick = onRemoveItem,
+                    modifier = Modifier
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFFF5252))
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Remove item",
+                        tint = Color.White,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                // Quantity controls
                 IconButton(
                     onClick = {
                         quantity++
@@ -336,6 +364,9 @@ private fun CartItemRow(
                         if (quantity > 1) {
                             quantity--
                             onQuantityChange(quantity)
+                        } else {
+                            // If quantity is 1, remove the item
+                            onRemoveItem()
                         }
                     },
                     modifier = Modifier

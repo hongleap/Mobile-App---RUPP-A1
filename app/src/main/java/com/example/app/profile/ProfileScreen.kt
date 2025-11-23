@@ -47,8 +47,8 @@ fun ProfileScreen(
     onPaymentMethodClick: () -> Unit = {},
     onAddressClick: () -> Unit = {},
     onWishlistClick: () -> Unit = {},
-    onRedemptionClick: () -> Unit = {},
     onSupportClick: () -> Unit = {},
+    onWalletClick: () -> Unit = {},
     onEditProfileClick: () -> Unit = {},
     onSignOutClick: () -> Unit = {}
 ) {
@@ -113,8 +113,8 @@ fun ProfileScreen(
 
                 ProfileMenuItem(
                     icon = Icons.Default.Settings,
-                    title = "Redemption",
-                    onClick = onRedemptionClick
+                    title = "Wallet",
+                    onClick = onWalletClick
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))

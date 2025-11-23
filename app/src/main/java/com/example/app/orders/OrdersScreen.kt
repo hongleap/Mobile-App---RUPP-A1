@@ -194,20 +194,36 @@ private fun OrderCard(order: Order, onClick: () -> Unit) {
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Order icon
+            // Product image (show first item's image)
             Box(
                 modifier = Modifier
                     .size(48.dp)
                     .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFF0F0F0)),
-                contentAlignment = Alignment.Center
             ) {
-                Icon(
-                    imageVector = Icons.Filled.ShoppingCart,
-                    contentDescription = null,
-                    modifier = Modifier.size(24.dp),
-                    tint = Color(0xFF666666)
-                )
+                val firstItem = order.items.firstOrNull()
+                if (firstItem != null) {
+                    com.example.app.ui.ProductImage(
+                        productId = firstItem.productId,
+                        category = firstItem.category,
+                        contentDescription = firstItem.productName,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
+                    // Fallback to icon if no items
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(Color(0xFFF0F0F0)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.ShoppingCart,
+                            contentDescription = null,
+                            modifier = Modifier.size(24.dp),
+                            tint = Color(0xFF666666)
+                        )
+                    }
+                }
             }
 
             Spacer(modifier = Modifier.size(16.dp))

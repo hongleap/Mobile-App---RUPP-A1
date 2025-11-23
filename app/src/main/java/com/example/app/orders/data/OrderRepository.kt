@@ -24,7 +24,8 @@ data class OrderItem(
     val quantity: Int = 0,
     val price: Double = 0.0,
     val size: String? = null,
-    val color: String? = null
+    val color: String? = null,
+    val category: String? = null
 )
 
 object OrderRepository {
@@ -67,7 +68,8 @@ object OrderRepository {
                         "quantity" to item.quantity,
                         "price" to item.price,
                         "size" to (item.size ?: ""),
-                        "color" to (item.color ?: "")
+                        "color" to (item.color ?: ""),
+                        "category" to (item.category ?: "")
                     )
                 }
             )
@@ -110,7 +112,8 @@ object OrderRepository {
                             quantity = (item["quantity"] as? Number)?.toInt() ?: 0,
                             price = (item["price"] as? Number)?.toDouble() ?: 0.0,
                             size = item["size"] as? String,
-                            color = item["color"] as? String
+                            color = item["color"] as? String,
+                            category = item["category"] as? String
                         )
                     } ?: emptyList()
                     
