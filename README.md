@@ -382,10 +382,13 @@ The backend uses a microservices architecture with:
 ### Blockchain Integration
 
 **CToken Payment System:**
-- **Smart Contract**: ERC-20 token deployed on Ethereum Sepolia testnet
+- **Smart Contract**: ERC-20 token deployed on Binance Smart Chain Testnet
 - **Token Symbol**: CLOT
 - **Wallet Integration**: MetaMask for Android
-- **Network**: Sepolia Testnet (Chain ID: 11155111)
+- **Network**: Binance Smart Chain Testnet (Chain ID: 97)
+- **RPC URL**: https://data-seed-prebsc-1-s3.bnbchain.org:8545
+- **Currency Symbol**: tBNB
+- **Block Explorer**: https://testnet.bscscan.com
 
 **Transaction Service Features:**
 1. **Transaction Tracking**:
