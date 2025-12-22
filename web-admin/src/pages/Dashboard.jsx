@@ -3,6 +3,7 @@ import Sidebar from '../components/Sidebar';
 import { ShoppingCart, Users, DollarSign, TrendingUp, Clock, Package } from 'lucide-react';
 import axios from 'axios';
 import { auth } from '../config/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 
 const StatCard = ({ icon, label, value, color, loading }) => (
     <div className="glass-card" style={{ padding: '1.5rem', flex: 1, minWidth: '240px', transition: 'transform 0.3s ease' }}>
@@ -31,20 +32,39 @@ const Dashboard = () => {
     useEffect(() => {
         const fetchStats = async () => {
             try {
-                const token = await auth.currentUser?.getIdToken();
+                setLoading(true);
+                // Wait for auth to be ready if it's not
+                const user = auth.currentUser;
+                if (!user) {
+                    console.log('Dashboard: No user found, waiting...');
+                    return;
+                }
+
+                const token = await user.getIdToken();
+                console.log('Dashboard: Fetching stats with token...');
                 const response = await axios.get('http://localhost:8080/api/admin/stats', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
+
+                console.log('Dashboard: Stats received:', response.data);
                 if (response.data.success) {
                     setStats(response.data.data);
                 }
             } catch (error) {
-                console.error('Error fetching stats:', error);
+                console.error('Dashboard: Error fetching stats:', error);
             } finally {
                 setLoading(false);
             }
         };
-        fetchStats();
+
+        // Use onAuthStateChanged to be safe
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchStats();
+            }
+        });
+
+        return () => unsubscribe();
     }, []);
 
     return (

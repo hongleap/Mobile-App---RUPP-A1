@@ -164,8 +164,11 @@ app.put('/api/orders/:id/status', async (req, res) => {
 // Admin Stats
 app.get('/api/admin/stats', async (req, res) => {
     try {
+        console.log('Fetching admin stats from Firestore...');
         const snapshot = await db.collection('orders').get();
+        console.log(`Snapshot size: ${snapshot.size}`);
         const orders = snapshot.docs.map(doc => doc.data());
+        console.log(`Found ${orders.length} orders in database.`);
 
         const totalOrders = orders.length;
         const totalRevenue = orders.reduce((sum, order) => sum + (parseFloat(order.total) || 0), 0);
@@ -180,6 +183,8 @@ app.get('/api/admin/stats', async (req, res) => {
             .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
             .slice(0, 5);
 
+        console.log('Stats calculated:', { totalOrders, totalRevenue, uniqueUsers });
+
         res.json({
             success: true,
             data: {
@@ -191,6 +196,7 @@ app.get('/api/admin/stats', async (req, res) => {
             }
         });
     } catch (error) {
+        console.error('Error in admin stats:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
