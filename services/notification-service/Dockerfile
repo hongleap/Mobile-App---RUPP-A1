@@ -1,24 +1,13 @@
-FROM gradle:7.6-jdk17 AS build
+FROM node:18-slim
 
 WORKDIR /app
 
-# Copy build files
-COPY build.gradle.kts settings.gradle.kts ./
-COPY shared-models ./shared-models
-COPY notification-service ./notification-service
+COPY package*.json ./
 
-# Build
-RUN gradle :notification-service:shadowJar --no-daemon -x test
+RUN npm install --production
 
-# Runtime stage
-FROM eclipse-temurin:17-jre
-
-WORKDIR /app
-
-# Copy built jar
-COPY --from=build /app/notification-service/build/libs/notification-service*.jar app.jar
+COPY . .
 
 EXPOSE 8083
 
-CMD ["java", "-jar", "app.jar"]
-
+CMD ["node", "index.js"]

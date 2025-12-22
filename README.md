@@ -21,8 +21,9 @@ A modern e-commerce application with an Android mobile app and microservices bac
 This project consists of three main components:
 
 1. **Android Mobile App** (`app/`) - User-facing mobile application
-2. **Microservices Backend** (`services/`) - Backend API services
-3. **Web Admin Dashboard** (`web/`) - Admin interface for product management
+2. **Microservices Backend** (`services/`) - Backend API services (Node.js)
+3. **Web Admin Dashboard** (`web-admin/`) - Modern React-based admin interface
+4. **Legacy Web Dashboard** (`web/`) - Static HTML admin interface (deprecated)
 
 ### Features
 
@@ -46,7 +47,7 @@ This project consists of three main components:
 ### Required Software
 
 - **Android Studio** (latest version) - For Android app development
-- **JDK 17 or higher** - For backend services
+- **Node.js 18 or higher** - For backend services
 - **Docker & Docker Compose** - For running backend services (recommended)
 - **Git** - For version control
 
@@ -73,22 +74,25 @@ APP/
 │   ├── google-services.json      # Firebase config (get from team lead)
 │   └── google-services.json.example
 │
-├── services/                     # Microservices Backend
+├── services/                     # Microservices Backend (Node.js)
 │   ├── api-gateway/             # API Gateway (Port 8080)
 │   ├── product-service/         # Product Service (Port 9091)
-│   ├── order-service/           # Order Service (Port 9092)
+│   ├── order-service/           # Order Service (Port 8092)
 │   ├── notification-service/    # Notification Service (Port 9093)
 │   ├── transaction-service/     # Transaction Service (Port 9094)
-│   ├── shared-models/           # Shared data models
 │   ├── docker-compose.yml       # Docker configuration
 │   ├── firebase-service-account.json  # Firebase config (get from team lead)
-│   └── firebase-service-account.json.example
+│   └── start-services.sh        # Convenience script to start services
 │
-└── web/                         # Web Admin Dashboard
+├── web-admin/                   # Modern React Admin Dashboard
+│   ├── src/                     # React source code
+│   ├── .env                     # Configuration (API keys)
+│   └── package.json
+│
+└── web/                         # Legacy Web Dashboard (Deprecated)
     ├── admin-login.html
     ├── admin-dashboard.html
-    ├── config.js                # Firebase config (get from team lead)
-    └── config.js.example
+    └── config.js                # Firebase config (get from team lead)
 ```
 
 ## 🚀 Local Setup
@@ -159,15 +163,9 @@ cd APP
 ```bash
 cd services
 
-# Make sure firebase-service-account.json is in this directory
+# Make sure firebase-service-account.json is in each service directory
+# (api-gateway, product-service, etc.)
 # Then run:
-docker-compose up --build
-```
-
-Or use the convenience script:
-```bash
-cd services
-chmod +x start-services.sh
 ./start-services.sh
 ```
 
@@ -176,22 +174,10 @@ chmod +x start-services.sh
 ```bash
 cd services
 
-# Build all services
-./gradlew build
-
-# Run each service in separate terminals:
-
-# Terminal 1 - Product Service
-cd product-service && ./gradlew run
-
-# Terminal 2 - Order Service
-cd order-service && ./gradlew run
-
-# Terminal 3 - Notification Service
-cd notification-service && ./gradlew run
-
-# Terminal 4 - API Gateway
-cd api-gateway && ./gradlew run
+# For each service (api-gateway, product-service, etc.):
+cd <service-name>
+npm install
+npm start
 ```
 
 #### Step 3: Verify Services are Running
@@ -367,8 +353,8 @@ The backend uses a microservices architecture with:
 - OkHttp (for API calls)
 
 **Backend Services:**
-- Kotlin
-- Ktor (HTTP server framework)
+- Node.js
+- Express.js
 - Firebase Admin SDK
 - Docker (containerization)
 

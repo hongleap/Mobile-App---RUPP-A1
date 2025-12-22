@@ -1,49 +1,38 @@
 services:
   api-gateway:
     build:
-      context: .
-      dockerfile: ./api-gateway/Dockerfile
+      context: ./api-gateway
     ports:
-      - "8080:8080" # Changed back to 8080
+      - "8080:8080"
     environment:
       - PRODUCT_SERVICE_URL=http://product-service:8081
       - ORDER_SERVICE_URL=http://order-service:8082
       - NOTIFICATION_SERVICE_URL=http://notification-service:8083
       - TRANSACTION_SERVICE_URL=http://transaction-service:8084
-    volumes:
-      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     depends_on:
       - product-service
       - order-service
       - notification-service
+      - transaction-service
     networks:
       - microservices-network
 
   product-service:
     build:
-      context: .
-      dockerfile: ./product-service/Dockerfile
+      context: ./product-service
     ports:
-      - "9091:8081" # Changed external port from 8081 to 9091
-    environment:
-      - FIRESTORE_PROJECT_ID=${FIRESTORE_PROJECT_ID:-your-project-id}
-    volumes:
-      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+      - "9091:8081"
     networks:
       - microservices-network
 
   order-service:
     build:
-      context: .
-      dockerfile: ./order-service/Dockerfile
+      context: ./order-service
     ports:
-      - "8092:8082" # Changed to avoid conflict with Antigravity
+      - "8092:8082"
     environment:
-      - FIRESTORE_PROJECT_ID=${FIRESTORE_PROJECT_ID:-your-project-id}
       - PRODUCT_SERVICE_URL=http://product-service:8081
       - NOTIFICATION_SERVICE_URL=http://notification-service:8083
-    volumes:
-      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     depends_on:
       - product-service
       - notification-service
@@ -52,27 +41,17 @@ services:
 
   notification-service:
     build:
-      context: .
-      dockerfile: ./notification-service/Dockerfile
+      context: ./notification-service
     ports:
-      - "9093:8083" # Changed external port from 8083 to 9093
-    environment:
-      - FIRESTORE_PROJECT_ID=${FIRESTORE_PROJECT_ID:-your-project-id}
-    volumes:
-      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+      - "9093:8083"
     networks:
       - microservices-network
 
   transaction-service:
     build:
-      context: .
-      dockerfile: ./transaction-service/Dockerfile
+      context: ./transaction-service
     ports:
       - "9094:8084"
-    environment:
-      - FIRESTORE_PROJECT_ID=${FIRESTORE_PROJECT_ID:-your-project-id}
-    volumes:
-      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - microservices-network
 
