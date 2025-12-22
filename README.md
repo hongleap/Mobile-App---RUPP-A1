@@ -115,4 +115,16 @@ A high-performance dashboard built with **React + Vite + Lucide Icons**.
 
 ---
 
-**Happy Coding! 🚀**
+<div align="center">
+
+### 🎓 Project Credits
+
+| | |
+| :--- | :--- |
+| **Project** | **E-Commerce** |
+| **Group** | **Group 2** |
+| **Academic Year** | **Year 4, Semester 1** |
+| **Professor** | **Heng Sovannarith** |
+| **Institution** | **Royal University of Phnom Penh** |
+
+</div>
