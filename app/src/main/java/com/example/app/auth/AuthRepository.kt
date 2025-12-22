@@ -1,6 +1,7 @@
 package com.example.app.auth
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -40,6 +41,17 @@ object AuthRepository {
             } else {
                 Result.failure(Exception("Sign in failed"))
             }
+        } catch (e: FirebaseAuthException) {
+            val message = when (e.errorCode) {
+                "ERROR_INVALID_EMAIL" -> "The email address is badly formatted."
+                "ERROR_WRONG_PASSWORD" -> "The password you entered is incorrect."
+                "ERROR_USER_NOT_FOUND" -> "No account found with this email."
+                "ERROR_USER_DISABLED" -> "This account has been disabled."
+                "ERROR_TOO_MANY_REQUESTS" -> "Too many failed attempts. Please try again later."
+                else -> e.message ?: "Sign in failed"
+            }
+            _errorMessage.value = message
+            Result.failure(Exception(message))
         } catch (e: Exception) {
             _errorMessage.value = e.message ?: "Sign in failed"
             Result.failure(e)
@@ -65,6 +77,15 @@ object AuthRepository {
             } else {
                 Result.failure(Exception("Account creation failed"))
             }
+        } catch (e: FirebaseAuthException) {
+            val message = when (e.errorCode) {
+                "ERROR_INVALID_EMAIL" -> "The email address is badly formatted."
+                "ERROR_EMAIL_ALREADY_IN_USE" -> "This email is already registered."
+                "ERROR_WEAK_PASSWORD" -> "The password is too weak."
+                else -> e.message ?: "Account creation failed"
+            }
+            _errorMessage.value = message
+            Result.failure(Exception(message))
         } catch (e: Exception) {
             _errorMessage.value = e.message ?: "Account creation failed"
             Result.failure(e)
@@ -80,6 +101,14 @@ object AuthRepository {
             
             auth.sendPasswordResetEmail(email).await()
             Result.success(Unit)
+        } catch (e: FirebaseAuthException) {
+            val message = when (e.errorCode) {
+                "ERROR_INVALID_EMAIL" -> "The email address is badly formatted."
+                "ERROR_USER_NOT_FOUND" -> "No account found with this email."
+                else -> e.message ?: "Failed to send password reset email"
+            }
+            _errorMessage.value = message
+            Result.failure(Exception(message))
         } catch (e: Exception) {
             _errorMessage.value = e.message ?: "Failed to send password reset email"
             Result.failure(e)

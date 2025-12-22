@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -88,7 +90,7 @@ fun Login(
                 centerHorizontallyTo(parent)
                 top.linkTo(parent.top, 190.0.dp)
                 width = Dimension.value(342.0.dp)
-                height = Dimension.value(230.0.dp)
+                height = Dimension.wrapContent
             },
             verticalArrangement = Arrangement.spacedBy(16.0.dp),
             horizontalAlignment = Alignment.Start
@@ -178,17 +180,15 @@ fun Login(
 
             // Create account link
             androidx.compose.material3.Text(
-                text = "Dont have an Account ? Create One",
+                text = "Don't have an account? Create One",
                 modifier = Modifier
-                    .wrapContentHeight(Alignment.Top)
-                    .size(190.0.dp, 15.0.dp)
-                    .clip(RoundedCornerShape(4.dp))
-                    .background(Color.Transparent)
+                    .fillMaxWidth()
+                    .padding(top = 8.dp)
                     .clickable(onClick = onCreateAccountClick),
                 style = LocalTextStyle.current.copy(
-                    color = Color(0.0f, 0.0f, 0.0f, 1.0f),
+                    color = Color(0.15f, 0.15f, 0.15f, 1.0f),
                     textAlign = TextAlign.Center,
-                    fontSize = 12.0.sp
+                    fontSize = 14.0.sp
                 )
             )
         }
@@ -204,9 +204,9 @@ fun Login(
         Column(
             Modifier.constrainAs(signUpMethodsRef) {
                 centerHorizontallyTo(parent)
-                top.linkTo(parent.top, 413.0.dp)
+                top.linkTo(frameRef.bottom, 32.0.dp)
                 width = Dimension.value(342.0.dp)
-                height = Dimension.value(171.0.dp)
+                height = Dimension.wrapContent
             },
             verticalArrangement = Arrangement.spacedBy(12.0.dp),
             horizontalAlignment = Alignment.Start

@@ -16,6 +16,9 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -221,13 +224,18 @@ fun MainScreen() {
             )
         }
         
-        // Show error message
+        // Show error message popup
         errorMessage?.let { error ->
-            LaunchedEffect(error) {
-                // Show error (you can use a Snackbar or AlertDialog here)
-                kotlinx.coroutines.delay(3000)
-                errorMessage = null
-            }
+            AlertDialog(
+                onDismissRequest = { errorMessage = null },
+                title = { Text("Authentication Error") },
+                text = { Text(error) },
+                confirmButton = {
+                    TextButton(onClick = { errorMessage = null }) {
+                        Text("Dismiss")
+                    }
+                }
+            )
         }
         
         AnimatedVisibility(

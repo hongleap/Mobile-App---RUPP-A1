@@ -13,6 +13,7 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONArray
 import org.json.JSONObject
+import kotlinx.coroutines.tasks.await
 import java.util.concurrent.TimeUnit
 
 object ApiClient {
@@ -27,8 +28,8 @@ object ApiClient {
     
     private val auth = FirebaseAuth.getInstance()
     
-    private fun getAuthToken(): String? {
-        return auth.currentUser?.getIdToken(false)?.result?.token
+    private suspend fun getAuthToken(): String? {
+        return auth.currentUser?.getIdToken(false)?.await()?.token
     }
     
     private suspend fun makeRequest(
@@ -153,6 +154,20 @@ object ApiClient {
         }
         
         return products
+    }
+    
+    suspend fun decreaseStock(productId: String, quantity: Int) {
+        val body = JSONObject().apply {
+            put("productId", productId)
+            put("quantity", quantity)
+        }.toString()
+        
+        val response = makeAuthenticatedRequest("/api/stock/decrease", "POST", body)
+        val json = JSONObject(response)
+        
+        if (!json.getBoolean("success")) {
+            throw Exception(json.optString("error", "Failed to decrease stock"))
+        }
     }
     
     private fun parseProduct(productObj: JSONObject): Product {
@@ -350,6 +365,32 @@ object ApiClient {
         makeRequest(
             "$BASE_URL/api/notifications/mark-all-read",
             method = "PUT",
+            requiresAuth = true
+        )
+    }
+    suspend fun updateOrderStatus(id: String, status: String) {
+        val body = JSONObject().apply {
+            put("status", status)
+        }.toString()
+        
+        makeRequest(
+            "$BASE_URL/api/orders/$id/status",
+            method = "PUT",
+            body = body,
+            requiresAuth = true
+        )
+    }
+    
+    suspend fun createNotification(message: String, type: String = "order") {
+        val body = JSONObject().apply {
+            put("message", message)
+            put("type", type)
+        }.toString()
+        
+        makeRequest(
+            "$BASE_URL/api/notifications",
+            method = "POST",
+            body = body,
             requiresAuth = true
         )
     }

@@ -189,6 +189,20 @@ fun CreateAccountScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
+            text = "Already have an account? Sign in",
+            style = LocalTextStyle.current.copy(
+                color = Color(0xFF262626),
+                textAlign = TextAlign.Start,
+                fontSize = 12.sp
+            ),
+            modifier = Modifier
+                .padding(top = 8.dp)
+                .clickable(onClick = onBackClick)
+        )
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
             text = "Forgot Password ? Reset",
             style = LocalTextStyle.current.copy(
                 color = Color(0xFF262626),

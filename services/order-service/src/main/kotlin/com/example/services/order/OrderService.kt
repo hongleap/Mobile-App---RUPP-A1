@@ -86,6 +86,9 @@ fun Application.module() {
         }
     }
     
+    val productServiceUrl = System.getenv("PRODUCT_SERVICE_URL") ?: "http://product-service:8081"
+    val notificationServiceUrl = System.getenv("NOTIFICATION_SERVICE_URL") ?: "http://notification-service:8083"
+    
     routing {
         route("/api/orders") {
             get {
@@ -256,7 +259,7 @@ fun Application.module() {
                     // Decrease stock for each product (call Product Service)
                     for (item in request.items) {
                         try {
-                            httpClient.post("http://localhost:8081/api/stock/decrease") {
+                            httpClient.post("$productServiceUrl/api/stock/decrease") {
                                 contentType(ContentType.Application.Json)
                                 setBody(mapOf("productId" to item.productId, "quantity" to item.quantity))
                             }
@@ -267,7 +270,7 @@ fun Application.module() {
                     
                     // Create notification (call Notification Service)
                     try {
-                        httpClient.post("http://localhost:8083/api/notifications") {
+                        httpClient.post("$notificationServiceUrl/api/notifications") {
                             contentType(ContentType.Application.Json)
                             setBody(CreateNotificationRequest(
                                 userId = userId,

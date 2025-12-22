@@ -1,28 +1,15 @@
 package com.example.app.data
 
-import com.google.firebase.firestore.FirebaseFirestore
-import kotlinx.coroutines.tasks.await
+
 
 object StockRepository {
-    private val db = FirebaseFirestore.getInstance()
     
     /**
      * Decrease stock for a product by the specified quantity
      */
     suspend fun decreaseStock(productId: String, quantity: Int): Result<Unit> {
         return try {
-            val productRef = db.collection("products").document(productId)
-            
-            // Use Firestore transaction to safely decrease stock
-            db.runTransaction { transaction ->
-                val snapshot = transaction.get(productRef)
-                val currentStock = (snapshot.get("stock") as? Number)?.toInt() ?: 0
-                val newStock = (currentStock - quantity).coerceAtLeast(0) // Don't go below 0
-                
-                transaction.update(productRef, "stock", newStock)
-                newStock
-            }.await()
-            
+            com.example.app.api.ApiClient.decreaseStock(productId, quantity)
             Result.success(Unit)
         } catch (e: Exception) {
             Result.failure(e)
