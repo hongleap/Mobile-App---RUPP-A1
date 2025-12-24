@@ -74,10 +74,18 @@ We use **Docker** to make setup effortless. Each service handles a specific part
 | **Transaction Service** | `9094` | Blockchain Verification, Replay Protection |
 
 ### 🔐 Firebase Setup
-1. Go to Firebase Console -> Project Settings -> Service Accounts.
-2. Generate a new private key.
-3. Rename it to `firebase-service-account.json`.
-4. Place it in `services/order-service/`, `services/api-gateway/`, etc. (or use the root `services/` folder if using the start script).
+1. Go to the [Firebase Console](https://console.firebase.google.com/) -> Project Settings -> Service Accounts.
+2. Click **Generate new private key** and download the JSON file.
+3. Rename the file to `firebase-service-account.json`.
+4. **Place the file** in the following directories:
+   - `services/api-gateway/`
+   - `services/product-service/`
+   - `services/order-service/`
+   - `services/notification-service/`
+   - `services/transaction-service/`
+
+> [!IMPORTANT]
+> **Security Note**: These files are excluded from Git via `.gitignore` to prevent security leaks. You must manually place them in each service directory for the backend to function correctly.
 
 ---
 
