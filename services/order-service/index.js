@@ -11,12 +11,21 @@ const port = process.env.PORT || 8082;
 
 // Initialize Firebase Admin SDK
 const serviceAccountPath = './firebase-service-account.json';
+let db;
+
 if (fs.existsSync(serviceAccountPath)) {
     try {
         const serviceAccount = require(serviceAccountPath);
+
+        // Fix private key formatting if it contains literal \n
+        if (serviceAccount.private_key && serviceAccount.private_key.includes('\\n')) {
+            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+        }
+
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount)
         });
+        db = admin.firestore();
         console.log('Firebase Admin SDK initialized successfully');
     } catch (error) {
         console.error('WARNING: Failed to initialize Firebase:', error.message);
@@ -25,7 +34,7 @@ if (fs.existsSync(serviceAccountPath)) {
     console.warn('WARNING: firebase-service-account.json not found. Firebase operations will fail.');
 }
 
-const db = admin.firestore();
+
 
 app.use(cors());
 app.use(express.json());

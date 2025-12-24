@@ -9,7 +9,7 @@ A professional, full-stack e-commerce solution featuring a **Kotlin Android App*
 ### 1. Backend (The Brain)
 ```bash
 cd services
-# 1. Place your firebase-service-account.json here
+# 1. Place your firebase-service-account.json in the services/ root directory
 # 2. Start everything with one command
 docker compose up --build -d
 ```
@@ -40,10 +40,10 @@ graph TD
     C[React Admin] -->|HTTP/JSON| B
     
     subgraph "Backend (Docker)"
-    B --> D[Product Service :8081]
-    B --> E[Order Service :8082]
-    B --> F[Notification Service :8083]
-    B --> G[Transaction Service :8084]
+    B --> D[Product Service :9091]
+    B --> E[Order Service :8092]
+    B --> F[Notification Service :9093]
+    B --> G[Transaction Service :9094]
     end
     
     D & E & F & G --> H[(Firebase Firestore)]
@@ -77,15 +77,10 @@ We use **Docker** to make setup effortless. Each service handles a specific part
 1. Go to the [Firebase Console](https://console.firebase.google.com/) -> Project Settings -> Service Accounts.
 2. Click **Generate new private key** and download the JSON file.
 3. Rename the file to `firebase-service-account.json`.
-4. **Place the file** in the following directories:
-   - `services/api-gateway/`
-   - `services/product-service/`
-   - `services/order-service/`
-   - `services/notification-service/`
-   - `services/transaction-service/`
+4. **Place the file** in the `services/` root directory.
 
 > [!IMPORTANT]
-> **Security Note**: These files are excluded from Git via `.gitignore` to prevent security leaks. You must manually place them in each service directory for the backend to function correctly.
+> **Security Note**: This file is shared across all microservices using Docker volumes. It is excluded from Git via `.gitignore` to prevent security leaks. You must manually place it in the `services/` directory for the backend to function correctly.
 
 ---
 

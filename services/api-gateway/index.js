@@ -14,6 +14,12 @@ const serviceAccountPath = './firebase-service-account.json';
 if (fs.existsSync(serviceAccountPath)) {
     try {
         const serviceAccount = require(serviceAccountPath);
+
+        // Fix private key formatting if it contains literal \n
+        if (serviceAccount.private_key && serviceAccount.private_key.includes('\\n')) {
+            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
+        }
+
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount)
         });
@@ -24,6 +30,7 @@ if (fs.existsSync(serviceAccountPath)) {
 } else {
     console.warn('WARNING: firebase-service-account.json not found. Token verification will fail.');
 }
+
 
 app.use(cors());
 app.use(express.json());

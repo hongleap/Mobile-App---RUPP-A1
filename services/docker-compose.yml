@@ -4,6 +4,8 @@ services:
       context: ./api-gateway
     ports:
       - "8080:8080"
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     environment:
       - PRODUCT_SERVICE_URL=http://product-service:8081
       - ORDER_SERVICE_URL=http://order-service:8082
@@ -22,6 +24,8 @@ services:
       context: ./product-service
     ports:
       - "9091:8081"
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - microservices-network
 
@@ -30,6 +34,8 @@ services:
       context: ./order-service
     ports:
       - "8092:8082"
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     environment:
       - PRODUCT_SERVICE_URL=http://product-service:8081
       - NOTIFICATION_SERVICE_URL=http://notification-service:8083
@@ -44,6 +50,8 @@ services:
       context: ./notification-service
     ports:
       - "9093:8083"
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - microservices-network
 
@@ -52,6 +60,8 @@ services:
       context: ./transaction-service
     ports:
       - "9094:8084"
+    volumes:
+      - ./firebase-service-account.json:/app/firebase-service-account.json:ro
     networks:
       - microservices-network
 
