@@ -15,8 +15,14 @@ A professional, full-stack e-commerce solution featuring a **Kotlin Android App*
 > [!IMPORTANT]
 > **Security Note**: This file is shared across all microservices using Docker volumes. It is excluded from Git via `.gitignore`. You must manually place it in the `services/` directory for the backend to function correctly.
 
-### 📱 2. Android Google Services
+### 2. Android Google Services
 1. Place your `google-services.json` in the `app/` directory.
+
+### 🔐 3. Web Admin Dashboard Configuration
+1. Go to the `web-admin/` directory.
+2. Copy `.env.example` to `.env`.
+3. Fill in your Firebase Web SDK configuration (API Key, Project ID, etc.).
+4. Set `VITE_API_URL=http://localhost:8080` (or your backend URL).
 
 ---
 

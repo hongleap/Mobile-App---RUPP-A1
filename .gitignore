@@ -31,4 +31,5 @@ local.properties
 **/firebase-service-account.json
 **/serviceAccountKey.json
 *.json.enc
-.env*
+.env
+!.env.example

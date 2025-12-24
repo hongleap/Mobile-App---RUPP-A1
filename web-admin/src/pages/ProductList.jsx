@@ -19,7 +19,8 @@ const ProductList = () => {
         setLoading(true);
         setError(null);
         try {
-            const response = await axios.get('http://localhost:8080/api/products');
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+            const response = await axios.get(`${apiUrl}/api/products`);
             if (response.data && response.data.success) {
                 setProducts(Array.isArray(response.data.data) ? response.data.data : []);
             } else {
@@ -38,7 +39,8 @@ const ProductList = () => {
         if (!window.confirm('Are you sure you want to delete this product?')) return;
         try {
             const token = await auth.currentUser?.getIdToken();
-            await axios.delete(`http://localhost:8080/api/products/${id}`, {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+            await axios.delete(`${apiUrl}/api/products/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setProducts(products.filter(p => p && p.id !== id));

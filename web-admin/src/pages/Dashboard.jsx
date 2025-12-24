@@ -24,7 +24,8 @@ const Dashboard = () => {
                 if (!user) return;
 
                 const token = await user.getIdToken();
-                const response = await axios.get('http://localhost:8080/api/admin/stats', {
+                const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+                const response = await axios.get(`${apiUrl}/api/admin/stats`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

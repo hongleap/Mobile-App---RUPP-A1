@@ -16,8 +16,13 @@ This is a modern, responsive admin dashboard for managing the e-commerce store. 
     npm install
     ```
 
-2.  **Configure Firebase**:
-    Update the `.env` file with your Firebase project credentials.
+2.  **Configure Environment**:
+    - Copy the example environment file:
+      ```bash
+      cp .env.example .env
+      ```
+    - Open `.env` and fill in your Firebase project credentials from the Firebase Console (Project Settings > General > Your apps > Web app).
+    - Ensure `VITE_API_URL` points to your running backend (default: `http://localhost:8080`).
 
 3.  **Run Development Server**:
     ```bash

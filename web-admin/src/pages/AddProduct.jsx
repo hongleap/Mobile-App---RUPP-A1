@@ -25,7 +25,8 @@ const AddProduct = () => {
         setLoading(true);
         try {
             const token = await auth.currentUser?.getIdToken();
-            const response = await axios.post('http://localhost:8080/api/products', {
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+            const response = await axios.post(`${apiUrl}/api/products`, {
                 ...formData,
                 price: parseFloat(formData.price),
                 stock: parseInt(formData.stock),
