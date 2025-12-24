@@ -42,6 +42,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import com.example.app.profile.data.PaymentMethod
 import com.example.app.profile.data.PaymentMethodStorage
 
@@ -66,13 +68,13 @@ fun PaymentMethodScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
         // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingXXXL),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -80,16 +82,15 @@ fun PaymentMethodScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
             Text(
                 text = "Payment",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                ),
-                color = Color(0xFF262626)
+                    color = AppColors.TextPrimary
+                )
             )
             Spacer(modifier = Modifier.size(48.dp))
         }
@@ -99,25 +100,27 @@ fun PaymentMethodScreen(
                 .weight(1f)
                 .fillMaxWidth()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = AppDimensions.SpacingL)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
 
             // Cards Section
             Text(
                 text = "Cards",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626),
-                modifier = Modifier.padding(vertical = 8.dp)
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                ),
+                modifier = Modifier.padding(vertical = AppDimensions.SpacingS)
             )
 
             if (paymentMethods.isEmpty()) {
                 Text(
                     text = "No payment methods saved. Tap + to add one.",
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666),
-                    modifier = Modifier.padding(vertical = 16.dp)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextSecondary
+                    ),
+                    modifier = Modifier.padding(vertical = AppDimensions.SpacingL)
                 )
             } else {
                 paymentMethods.forEach { method ->
@@ -125,41 +128,42 @@ fun PaymentMethodScreen(
                         method = method,
                         onClick = { onCardClick(method.id) }
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
                 }
             }
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
             // CToken Message
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = AppDimensions.SpacingL),
                 horizontalArrangement = Arrangement.Center
             ) {
                 Text(
                     text = "Spend 10$, Receive 1 CToken. ",
-                    fontSize = 14.sp,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextPrimary
+                    )
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
         }
         
         // Add button
         FloatingActionButton(
             onClick = onAddCard,
             modifier = Modifier
-                .padding(16.dp)
+                .padding(AppDimensions.SpacingL)
                 .align(Alignment.End),
-            containerColor = Color(0xFF262626)
+            containerColor = AppColors.Primary
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = "Add Payment Method",
-                tint = Color.White
+                tint = AppColors.TextOnPrimary
             )
         }
     }
@@ -179,65 +183,69 @@ private fun PaymentCardItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusL))
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
                 ) {
                     Text(
                         text = maskedNumber,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF262626)
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.TextPrimary
+                        )
                     )
                     // Card type icon placeholder
                     Box(
                         modifier = Modifier
-                            .size(32.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(Color(0xFFEB001B))
+                            .size(AppDimensions.IconL)
+                            .clip(RoundedCornerShape(AppDimensions.RadiusXS))
+                            .background(AppColors.AccentRed)
                     )
                 }
                 if (method.cardholderName.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                     Text(
                         text = method.cardholderName,
-                        fontSize = 14.sp,
-                        color = Color(0xFF666666)
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = AppColors.TextSecondary
+                        )
                     )
                 }
                 if (method.expiryDate.isNotEmpty()) {
                     Text(
                         text = "Expires: ${method.expiryDate}",
-                        fontSize = 12.sp,
-                        color = Color(0xFF666666)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.TextSecondary
+                        )
                     )
                 }
                 if (method.isDefault) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                     Text(
                         text = "Default",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4CAF50)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.Primary
+                        )
                     )
                 }
             }
             Icon(
                 imageVector = Icons.Default.KeyboardArrowRight,
                 contentDescription = "Select",
-                tint = Color(0xFF262626)
+                tint = AppColors.TextPrimary
             )
         }
     }

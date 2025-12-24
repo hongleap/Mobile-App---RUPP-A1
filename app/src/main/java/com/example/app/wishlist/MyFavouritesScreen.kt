@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -38,6 +39,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 data class FavoriteProduct(
     val id: String,
@@ -60,13 +63,13 @@ fun MyFavouritesScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
         // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingXXL),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -74,16 +77,15 @@ fun MyFavouritesScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
             Text(
                 text = "My Favourites (${products.size})",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                ),
-                color = Color(0xFF262626)
+                    color = AppColors.TextPrimary
+                )
             )
             Spacer(modifier = Modifier.size(48.dp))
         }
@@ -91,9 +93,9 @@ fun MyFavouritesScreen(
         // Product Grid
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = androidx.compose.foundation.layout.PaddingValues(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingS),
+            verticalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM),
+            horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
         ) {
             items(products) { product ->
                 FavoriteProductCard(
@@ -115,9 +117,9 @@ private fun FavoriteProductCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusL))
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Box {
@@ -126,8 +128,8 @@ private fun FavoriteProductCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(1f)
-                    .clip(RoundedCornerShape(12.dp, 12.dp, 0.dp, 0.dp))
-                    .background(Color(0xFFE8E8E8))
+                    .clip(RoundedCornerShape(topStart = AppDimensions.RadiusL, topEnd = AppDimensions.RadiusL))
+                    .background(AppColors.SurfaceVariant)
             )
 
             // Favorite icon
@@ -135,13 +137,13 @@ private fun FavoriteProductCard(
                 onClick = { isFavorite = !isFavorite },
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(8.dp)
+                    .padding(AppDimensions.SpacingS)
             ) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.Favorite,
                     contentDescription = "Favorite",
-                    tint = Color(0xFFFF0000),
-                    modifier = Modifier.size(20.dp)
+                    tint = AppColors.AccentRed,
+                    modifier = Modifier.size(AppDimensions.IconS)
                 )
             }
 
@@ -149,20 +151,22 @@ private fun FavoriteProductCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp)
+                    .padding(AppDimensions.SpacingM)
             ) {
                 Text(
                     text = product.name,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Medium,
+                        color = AppColors.TextPrimary
+                    )
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                 Text(
                     text = product.price,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
+                    )
                 )
             }
         }

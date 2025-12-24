@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -46,6 +47,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 data class CartItem(
     val id: String,
@@ -71,13 +74,13 @@ fun CartScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
         // Header with back button, title, and Remove All
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingL),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -85,22 +88,22 @@ fun CartScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
             Text(
                 text = "Cart",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                ),
-                color = Color(0xFF262626)
+                    color = AppColors.TextPrimary
+                )
             )
             if (cartItems.isNotEmpty()) {
                 Text(
                     text = "Remove All",
-                    fontSize = 14.sp,
-                    color = Color(0xFF262626),
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextPrimary
+                    ),
                     modifier = Modifier.clickable(onClick = onRemoveAll)
                 )
             } else {
@@ -130,7 +133,7 @@ fun CartScreen(
                 onNotificationsClick = {},
                 onProfileClick = {}
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
         }
     }
 }
@@ -140,7 +143,7 @@ private fun EmptyCartState(onExploreCategories: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = AppDimensions.SpacingXXXL),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -153,38 +156,40 @@ private fun EmptyCartState(onExploreCategories: () -> Unit) {
                 imageVector = Icons.Filled.ShoppingCart,
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
-                tint = Color(0xFFFF9800)
+                tint = AppColors.Primary
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         Text(
             text = "Your cart is empty",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF262626)
+            style = MaterialTheme.typography.titleLarge.copy(
+                color = AppColors.TextPrimary,
+                fontWeight = FontWeight.Bold
+            )
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         // Explore Categories button
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(AppDimensions.RadiusM))
                 .clickable(onClick = onExploreCategories),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+            colors = CardDefaults.cardColors(containerColor = AppColors.Primary)
         ) {
             Text(
                 text = "Explore Categories",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = AppDimensions.SpacingL),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                color = Color.White,
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = AppColors.TextOnPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }
@@ -208,7 +213,7 @@ private fun CartItemsList(
         modifier = modifier
             .fillMaxWidth()
             .verticalScroll(scrollState)
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = AppDimensions.SpacingL)
     ) {
         // Cart items
         items.forEach { item ->
@@ -221,10 +226,10 @@ private fun CartItemsList(
                     onRemoveItem(item.id)
                 }
             )
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
 
         // Order Summary
         OrderSummarySection(
@@ -234,12 +239,12 @@ private fun CartItemsList(
             total = total
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
 
         // Coupon Code Input
         CouponCodeInput()
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
 
         // Checkout Button
         CheckoutButton(
@@ -247,7 +252,7 @@ private fun CartItemsList(
             modifier = Modifier.fillMaxWidth()
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
     }
 }
 
@@ -262,25 +267,25 @@ private fun CartItemRow(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+            .clip(RoundedCornerShape(AppDimensions.RadiusM)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Product image placeholder
             Box(
                 modifier = Modifier
                     .size(80.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFE8E8E8))
+                    .clip(RoundedCornerShape(AppDimensions.RadiusS))
+                    .background(AppColors.SurfaceVariant)
             )
 
-            Spacer(modifier = Modifier.size(12.dp))
+            Spacer(modifier = Modifier.width(AppDimensions.SpacingM))
 
             // Product details
             Column(
@@ -288,35 +293,38 @@ private fun CartItemRow(
             ) {
                 Text(
                     text = item.name,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
                 if (item.size.isNotEmpty() || item.color.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                     Text(
                         text = buildString {
                             if (item.size.isNotEmpty()) append("Size - ${item.size}")
                             if (item.size.isNotEmpty() && item.color.isNotEmpty()) append(", ")
                             if (item.color.isNotEmpty()) append("Color - ${item.color}")
                         },
-                        fontSize = 12.sp,
-                        color = Color(0xFF999999)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.TextSecondary
+                        )
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                 Text(
                     text = "$${String.format("%.2f", item.price)}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
             }
 
             // Quantity controls and delete button - vertical layout
             Column(
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                verticalArrangement = Arrangement.spacedBy(AppDimensions.SpacingS)
             ) {
                 // Delete button
                 IconButton(
@@ -324,12 +332,12 @@ private fun CartItemRow(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFFF5252))
+                        .background(AppColors.AccentRed.copy(alpha = 0.1f))
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = "Remove item",
-                        tint = Color.White,
+                        tint = AppColors.AccentRed,
                         modifier = Modifier.size(18.dp)
                     )
                 }
@@ -345,19 +353,21 @@ private fun CartItemRow(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF2D2D2D))
+                        .background(AppColors.Primary)
                 ) {
                     Text(
                         text = "+",
-                        fontSize = 20.sp,
-                        color = Color.White
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = AppColors.TextOnPrimary
+                        )
                     )
                 }
                 Text(
                     text = quantity.toString(),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
                 IconButton(
                     onClick = {
@@ -372,12 +382,13 @@ private fun CartItemRow(
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF2D2D2D))
+                        .background(AppColors.Primary)
                 ) {
                     Text(
                         text = "−",
-                        fontSize = 20.sp,
-                        color = Color.White
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            color = AppColors.TextOnPrimary
+                        )
                     )
                 }
             }
@@ -399,13 +410,16 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Subtotal",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextSecondary
+                )
             )
             Text(
                 text = "$${String.format("%.2f", subtotal)}",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Medium
+                )
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -415,13 +429,16 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Shipping Cost",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextSecondary
+                )
             )
             Text(
                 text = "$${String.format("%.2f", shippingCost)}",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Medium
+                )
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -431,13 +448,16 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Tax",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextSecondary
+                )
             )
             Text(
                 text = "$${String.format("%.2f", tax)}",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Medium
+                )
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -447,15 +467,17 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Total",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
             Text(
                 text = "$${String.format("%.2f", total)}",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }
@@ -468,41 +490,43 @@ private fun CouponCodeInput() {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusM))
             .clickable { /* Open coupon input */ },
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
             ) {
                 // Coupon icon (green tag icon)
                 Box(
                     modifier = Modifier
                         .size(24.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF4CAF50)),
+                        .background(AppColors.PrimaryLight),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "%",
-                        fontSize = 14.sp,
-                        color = Color.White,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.Primary,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
                 }
                 Text(
                     text = if (couponCode.isEmpty()) "Enter Coupon Code" else couponCode,
-                    fontSize = 14.sp,
-                    color = if (couponCode.isEmpty()) Color(0xFF999999) else Color(0xFF262626)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = if (couponCode.isEmpty()) AppColors.TextTertiary else AppColors.TextPrimary
+                    )
                 )
             }
             IconButton(
@@ -510,12 +534,12 @@ private fun CouponCodeInput() {
                 modifier = Modifier
                     .size(32.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF2D2D2D))
+                    .background(AppColors.Primary)
             ) {
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowRight,
                     contentDescription = "Apply",
-                    tint = Color.White
+                    tint = AppColors.TextOnPrimary
                 )
             }
         }
@@ -529,20 +553,21 @@ private fun CheckoutButton(
 ) {
     Card(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusM))
             .clickable(onClick = onCheckout),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Primary),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Text(
             text = "Checkout",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp),
+                .padding(vertical = AppDimensions.SpacingL),
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color.White
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = AppColors.TextOnPrimary,
+                fontWeight = FontWeight.Bold
+            )
         )
     }
 }
@@ -557,34 +582,34 @@ private fun BottomNavBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp))
-            .background(Color(0xFFF6F6F6))
-            .padding(horizontal = 24.dp, vertical = 12.dp),
+            .clip(RoundedCornerShape(AppDimensions.RadiusL, AppDimensions.RadiusL, 0.dp, 0.dp))
+            .background(AppColors.Surface)
+            .padding(horizontal = AppDimensions.SpacingXXXL, vertical = AppDimensions.SpacingM),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = Icons.Filled.Home,
             contentDescription = "Home",
-            tint = Color(0xFF262626),
+            tint = AppColors.TextPrimary,
             modifier = Modifier.clickable(onClick = onHomeClick)
         )
         Icon(
             imageVector = Icons.Filled.Notifications,
             contentDescription = "Notifications",
-            tint = Color(0xFF262626),
+            tint = AppColors.TextPrimary,
             modifier = Modifier.clickable(onClick = onNotificationsClick)
         )
         Icon(
             imageVector = Icons.Filled.ShoppingCart,
             contentDescription = "Orders",
-            tint = Color(0xFF262626),
+            tint = AppColors.TextPrimary,
             modifier = Modifier.clickable(onClick = onOrdersClick)
         )
         Icon(
             imageVector = Icons.Filled.Person,
             contentDescription = "Profile",
-            tint = Color(0xFF262626),
+            tint = AppColors.TextPrimary,
             modifier = Modifier.clickable(onClick = onProfileClick)
         )
     }

@@ -14,10 +14,10 @@ const Sidebar = () => {
     };
 
     const navItems = [
-        { path: '/', icon: <LayoutDashboard size={20} />, label: 'Overview' },
-        { path: '/products', icon: <Package size={20} />, label: 'Products' },
-        { path: '/add-product', icon: <PlusCircle size={20} />, label: 'Add Product' },
-        { path: '/admins', icon: <Shield size={20} />, label: 'Admins' },
+        { path: '/', icon: <LayoutDashboard size={22} />, label: 'Overview' },
+        { path: '/products', icon: <Package size={22} />, label: 'Products' },
+        { path: '/add-product', icon: <PlusCircle size={22} />, label: 'Add Product' },
+        { path: '/admins', icon: <Shield size={22} />, label: 'Admins' },
     ];
 
     return (
@@ -26,63 +26,111 @@ const Sidebar = () => {
             height: '100vh',
             background: 'var(--bg-card)',
             borderRight: '1px solid var(--border)',
-            padding: '2rem 1rem',
+            padding: '2.5rem 1.25rem',
             display: 'flex',
             flexDirection: 'column',
             position: 'fixed',
             left: 0,
-            top: 0
+            top: 0,
+            zIndex: 100
         }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '3rem', padding: '0 1rem' }}>
-                <div style={{ background: 'var(--primary)', padding: '0.6rem', borderRadius: '10px' }}>
-                    <ShoppingBag size={28} color="white" />
+            <div style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '1rem',
+                marginBottom: '3.5rem',
+                padding: '0 0.75rem'
+            }} className="animate-slide-up">
+                <div style={{
+                    background: 'linear-gradient(135deg, var(--primary), var(--primary-hover))',
+                    padding: '0.7rem',
+                    borderRadius: '14px',
+                    boxShadow: '0 8px 16px -4px rgba(99, 102, 241, 0.5)'
+                }}>
+                    <ShoppingBag size={26} color="white" />
                 </div>
-                <h2 style={{ fontSize: '1.5rem', fontWeight: '800', letterSpacing: '-0.02em' }}>StoreAdmin</h2>
+                <h2 style={{
+                    fontSize: '1.6rem',
+                    fontWeight: '900',
+                    letterSpacing: '-0.03em',
+                    color: 'var(--text-main)'
+                }}>
+                    StoreAdmin
+                </h2>
             </div>
 
-            <nav style={{ flex: 1 }}>
-                {navItems.map((item) => (
-                    <Link
-                        key={item.path}
-                        to={item.path}
-                        style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '1rem',
-                            padding: '1rem 1.25rem',
-                            borderRadius: '10px',
-                            color: location.pathname === item.path ? 'white' : 'var(--text-muted)',
-                            background: location.pathname === item.path ? 'var(--primary)' : 'transparent',
-                            textDecoration: 'none',
-                            marginBottom: '0.75rem',
-                            transition: 'all 0.2s ease',
-                            fontSize: '1.1rem'
-                        }}
-                    >
-                        {React.cloneElement(item.icon, { size: 24 })}
-                        <span style={{ fontWeight: '600' }}>{item.label}</span>
-                    </Link>
-                ))}
+            <nav className="animate-slide-up" style={{ flex: 1, animationDelay: '100ms' }}>
+                {navItems.map((item) => {
+                    const isActive = location.pathname === item.path;
+                    return (
+                        <Link
+                            key={item.path}
+                            to={item.path}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '1rem',
+                                padding: '0.85rem 1.25rem',
+                                borderRadius: '14px',
+                                color: isActive ? 'white' : 'var(--text-muted)',
+                                background: isActive ? 'var(--primary)' : 'transparent',
+                                textDecoration: 'none',
+                                marginBottom: '0.6rem',
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)',
+                                fontSize: '1.05rem',
+                                boxShadow: isActive ? '0 10px 15px -3px rgba(99, 102, 241, 0.3)' : 'none',
+                                border: '1px solid',
+                                borderColor: isActive ? 'var(--primary)' : 'transparent'
+                            }}
+                            onMouseEnter={(e) => {
+                                if (!isActive) {
+                                    e.currentTarget.style.background = 'rgba(255, 255, 255, 0.05)';
+                                    e.currentTarget.style.color = 'var(--text-main)';
+                                }
+                            }}
+                            onMouseLeave={(e) => {
+                                if (!isActive) {
+                                    e.currentTarget.style.background = 'transparent';
+                                    e.currentTarget.style.color = 'var(--text-muted)';
+                                }
+                            }}
+                        >
+                            {item.icon}
+                            <span style={{ fontWeight: isActive ? '700' : '600' }}>{item.label}</span>
+                        </Link>
+                    );
+                })}
             </nav>
 
             <button
                 onClick={handleLogout}
+                className="animate-slide-up"
                 style={{
                     display: 'flex',
                     alignItems: 'center',
                     gap: '1rem',
                     padding: '1rem 1.25rem',
-                    borderRadius: '10px',
+                    borderRadius: '14px',
                     color: 'var(--danger)',
-                    background: 'transparent',
+                    background: 'rgba(239, 68, 68, 0.05)',
                     width: '100%',
                     textAlign: 'left',
                     marginTop: 'auto',
-                    fontSize: '1.1rem'
+                    fontSize: '1.05rem',
+                    border: '1px solid transparent',
+                    animationDelay: '200ms'
+                }}
+                onMouseEnter={(e) => {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.1)';
+                    e.currentTarget.style.borderColor = 'rgba(239, 68, 68, 0.2)';
+                }}
+                onMouseLeave={(e) => {
+                    e.currentTarget.style.background = 'rgba(239, 68, 68, 0.05)';
+                    e.currentTarget.style.borderColor = 'transparent';
                 }}
             >
-                <LogOut size={24} />
-                <span style={{ fontWeight: '600' }}>Logout</span>
+                <LogOut size={22} />
+                <span style={{ fontWeight: '700' }}>Logout</span>
             </button>
         </div>
     );

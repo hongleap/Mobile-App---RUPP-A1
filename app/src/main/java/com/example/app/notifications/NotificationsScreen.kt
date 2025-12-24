@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -34,6 +35,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import com.example.app.notifications.data.Notification
 
 @Composable
@@ -48,19 +51,18 @@ fun NotificationsScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
         // Header
         Text(
             text = "Notifications",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingL),
             style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            ),
-            color = Color(0xFF262626)
+                color = AppColors.TextPrimary
+            )
         )
 
         if (notifications.isEmpty()) {
@@ -80,7 +82,7 @@ fun NotificationsScreen(
                 onNotificationsClick = {},
                 onProfileClick = onProfileClick
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
         }
     }
 }
@@ -90,7 +92,7 @@ private fun EmptyNotificationsState(onExploreCategories: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = AppDimensions.SpacingXXXL),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -103,38 +105,40 @@ private fun EmptyNotificationsState(onExploreCategories: () -> Unit) {
                 imageVector = Icons.Filled.Notifications,
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
-                tint = Color(0xFFFFC107)
+                tint = AppColors.Primary
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         Text(
             text = "No Notification yet",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF262626)
+            style = MaterialTheme.typography.titleLarge.copy(
+                color = AppColors.TextPrimary,
+                fontWeight = FontWeight.Bold
+            )
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         // Explore Categories button
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(AppDimensions.RadiusM))
                 .clickable(onClick = onExploreCategories),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+            colors = CardDefaults.cardColors(containerColor = AppColors.Primary)
         ) {
             Text(
                 text = "Explore Categories",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = AppDimensions.SpacingL),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                color = Color.White,
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = AppColors.TextOnPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }
@@ -145,8 +149,8 @@ private fun NotificationsList(notifications: List<Notification>) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(horizontal = AppDimensions.SpacingL),
+        verticalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
     ) {
         notifications.forEach { notification ->
             NotificationCard(notification = notification)
@@ -159,13 +163,13 @@ private fun NotificationCard(notification: Notification) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFAFAFA))
+            .clip(RoundedCornerShape(AppDimensions.RadiusM)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Bell icon with optional red dot
@@ -173,29 +177,30 @@ private fun NotificationCard(notification: Notification) {
                 Icon(
                     imageVector = Icons.Filled.Notifications,
                     contentDescription = null,
-                    modifier = Modifier.size(32.dp),
-                    tint = Color(0xFF666666)
+                    modifier = Modifier.size(AppDimensions.IconLarge),
+                    tint = AppColors.TextTertiary
                 )
                 if (!notification.isRead) {
                     Box(
                         modifier = Modifier
                             .align(Alignment.TopEnd)
-                            .size(12.dp)
+                            .size(10.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFFE53935))
+                            .background(AppColors.AccentRed)
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(AppDimensions.SpacingL))
 
             // Notification message
             Text(
                 text = notification.message,
                 modifier = Modifier.weight(1f),
-                fontSize = 14.sp,
-                color = Color(0xFF262626),
-                lineHeight = 20.sp
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary,
+                    lineHeight = 20.sp
+                )
             )
         }
     }
@@ -212,16 +217,16 @@ private fun BottomNavBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp))
-            .background(Color(0xFFF6F6F6))
-            .padding(horizontal = 24.dp, vertical = 12.dp),
+            .clip(RoundedCornerShape(AppDimensions.RadiusL, AppDimensions.RadiusL, 0.dp, 0.dp))
+            .background(AppColors.Surface)
+            .padding(horizontal = AppDimensions.SpacingXXXL, vertical = AppDimensions.SpacingM),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val homeColor = if (selectedTab == "home") Color(0xFF6B5BFF) else Color(0xFF262626)
-        val ordersColor = if (selectedTab == "orders") Color(0xFF6B5BFF) else Color(0xFF262626)
-        val notificationsColor = if (selectedTab == "notifications") Color(0xFF6B5BFF) else Color(0xFF262626)
-        val profileColor = if (selectedTab == "profile") Color(0xFF6B5BFF) else Color(0xFF262626)
+        val homeColor = if (selectedTab == "home") AppColors.Primary else AppColors.TextPrimary
+        val ordersColor = if (selectedTab == "orders") AppColors.Primary else AppColors.TextPrimary
+        val notificationsColor = if (selectedTab == "notifications") AppColors.Primary else AppColors.TextPrimary
+        val profileColor = if (selectedTab == "profile") AppColors.Primary else AppColors.TextPrimary
 
         Box {
             Icon(

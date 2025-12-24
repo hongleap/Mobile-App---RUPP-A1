@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -23,6 +24,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 @Composable
 fun OrderPlacedScreen(
@@ -31,12 +34,12 @@ fun OrderPlacedScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2D2D2D))
+            .background(AppColors.Primary)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
+                .padding(AppDimensions.SpacingXXXL),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
@@ -51,14 +54,14 @@ fun OrderPlacedScreen(
                 Box(
                     modifier = Modifier
                         .size(200.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(Color(0xFF3D3D3D)),
+                        .clip(RoundedCornerShape(AppDimensions.RadiusM))
+                        .background(AppColors.Surface.copy(alpha = 0.1f)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
                         text = "✓",
                         fontSize = 80.sp,
-                        color = Color(0xFF4CAF50),
+                        color = AppColors.TextOnPrimary,
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -68,49 +71,52 @@ fun OrderPlacedScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp)),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+                    .clip(RoundedCornerShape(topStart = AppDimensions.RadiusXXL, topEnd = AppDimensions.RadiusXXL)),
+                colors = CardDefaults.cardColors(containerColor = AppColors.Background)
             ) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(24.dp),
+                        .padding(AppDimensions.SpacingXXXL),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "Order Placed Successfully",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF262626)
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.TextPrimary
+                        )
                     )
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
 
                     Text(
                         text = "You will receive an email confirmation",
-                        fontSize = 14.sp,
-                        color = Color(0xFF999999)
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = AppColors.TextSecondary
+                        )
                     )
 
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
                     // See Order Details button
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(12.dp))
+                            .clip(RoundedCornerShape(AppDimensions.RadiusM))
                             .clickable(onClick = onSeeOrderDetails),
-                        colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+                        colors = CardDefaults.cardColors(containerColor = AppColors.Primary)
                     ) {
                         Text(
                             text = "See Order details",
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(vertical = 16.dp),
+                                .padding(vertical = AppDimensions.SpacingL),
                             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                                color = AppColors.TextOnPrimary
+                            )
                         )
                     }
                 }

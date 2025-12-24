@@ -1,6 +1,8 @@
 package com.example.app.home
 
 import androidx.compose.runtime.collectAsState
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -34,6 +36,9 @@ import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.ui.draw.scale
 import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -100,45 +105,45 @@ fun HomeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
+            .background(AppColors.Background)
             .verticalScroll(scrollState)
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = AppDimensions.SpacingL)
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
         HeaderRow(
             onCartClick = onCartClick,
             tokenBalance = tokenBalance
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
         SearchBar(onSearchSubmit = onSearchSubmit, onFilterClick = onFilterClick)
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
         
         // Promotional Banner
         PromotionBanner()
         
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
         SectionHeader(title = "Categories", action = "See All", onAction = onSeeAllCategories)
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
         CategoriesRow(onSelectCategory = onSelectCategory)
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
         SectionHeader(title = "Top Selling", action = "See All", onAction = {})
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
         ProductCarousel(onProductClick = onProductClick)
 
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
         SectionHeader(title = "New In", action = "See All", onAction = {})
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
         ProductCarousel(onProductClick = onProductClick)
         
-        Spacer(modifier = Modifier.height(20.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
         // Special Offers Section
         SpecialOffersSection()
         
         // Bottom padding for scroll
-        Spacer(modifier = Modifier.height(80.dp))
+        Spacer(modifier = Modifier.height(120.dp))
     }
     
     // Bottom navigation bar and floating chat button (outside scrollable content)
@@ -149,7 +154,7 @@ fun HomeScreen(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = AppDimensions.SpacingL)
             ) {
                 BottomNavBar(
                     modifier = Modifier.align(Alignment.BottomCenter),
@@ -166,7 +171,7 @@ fun HomeScreen(
         FloatingChatButton(
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(bottom = 72.dp, start = 16.dp),
+                .padding(bottom = 72.dp, start = AppDimensions.SpacingL),
             onClick = onChatClick
         )
     }
@@ -180,38 +185,38 @@ private fun HeaderRow(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = AppDimensions.SpacingXS),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
+        horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
     ) {
         // Profile card with avatar and CToken
         Card(
             modifier = Modifier
                 .weight(1f)
                 .clickable { },
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+            shape = RoundedCornerShape(AppDimensions.RadiusM),
+            colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceVariant),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 12.dp, vertical = 10.dp),
+                    .padding(horizontal = AppDimensions.SpacingM, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
             ) {
                 // Avatar
                 Box(
                     modifier = Modifier
-                        .size(44.dp)
+                        .size(40.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFE8E8E8)),
+                        .background(AppColors.Border),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         imageVector = Icons.Filled.Person,
                         contentDescription = "Profile",
-                        tint = Color(0xFF999999),
-                        modifier = Modifier.size(24.dp)
+                        tint = AppColors.TextTertiary,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
                 // Token balance text
@@ -220,8 +225,8 @@ private fun HeaderRow(
                         "${TokenService.formatTokenAmount(it)} ${TokenConfig.TOKEN_SYMBOL}"
                     } ?: "0 ${TokenConfig.TOKEN_SYMBOL}",
                     fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF262626)
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
                 )
             }
         }
@@ -229,26 +234,26 @@ private fun HeaderRow(
         // Gender button with dropdown
         Card(
             modifier = Modifier.clickable { },
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+            shape = RoundedCornerShape(AppDimensions.RadiusM),
+            colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceVariant),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Row(
                 modifier = Modifier
-                    .padding(horizontal = 16.dp, vertical = 10.dp),
+                    .padding(horizontal = AppDimensions.SpacingL, vertical = 10.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 Text(
                     text = "Men",
                     fontSize = 15.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF262626)
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
                 )
                 Icon(
                     imageVector = Icons.Filled.KeyboardArrowDown,
                     contentDescription = "Dropdown",
-                    tint = Color(0xFF666666),
+                    tint = AppColors.TextSecondary,
                     modifier = Modifier.size(18.dp)
                 )
             }
@@ -259,34 +264,17 @@ private fun HeaderRow(
             modifier = Modifier
                 .size(44.dp)
                 .clip(CircleShape)
-                .background(Color(0xFFEDEAFD))
+                .background(AppColors.PrimaryLight)
                 .clickable(onClick = onCartClick),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Filled.ShoppingCart, 
                 contentDescription = "Cart", 
-                tint = Color(0xFF6B5BFF),
+                tint = AppColors.Primary,
                 modifier = Modifier.size(22.dp)
             )
         }
-    }
-}
-
-@Composable
-private fun Chip(text: String) {
-    Card(
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
-        shape = RoundedCornerShape(20.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
-    ) {
-        Text(
-            text = text,
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
-            color = Color(0xFF262626),
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Medium
-        )
     }
 }
 
@@ -299,15 +287,15 @@ private fun SearchBar(onSearchSubmit: (String) -> Unit = {}, onFilterClick: () -
         onValueChange = { query = it },
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp))
-            .background(Color(0xFFF4F4F4)),
-        placeholder = { Text("Search") },
+            .clip(RoundedCornerShape(AppDimensions.RadiusL))
+            .background(AppColors.SurfaceVariant),
+        placeholder = { Text("Search products...", color = AppColors.TextTertiary) },
         leadingIcon = {
-            Icon(imageVector = Icons.Filled.Search, contentDescription = "Search", tint = Color(0xFF666666))
+            Icon(imageVector = Icons.Filled.Search, contentDescription = "Search", tint = AppColors.TextSecondary)
         },
         trailingIcon = {
             androidx.compose.material3.IconButton(onClick = onFilterClick) {
-                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "Filter", tint = Color(0xFF666666))
+                Icon(imageVector = Icons.Filled.MoreVert, contentDescription = "Filter", tint = AppColors.TextSecondary)
             }
         },
         keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(imeAction = androidx.compose.ui.text.input.ImeAction.Search),
@@ -316,10 +304,11 @@ private fun SearchBar(onSearchSubmit: (String) -> Unit = {}, onFilterClick: () -
         ),
         singleLine = true,
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = Color(0xFFF4F4F4),
-            unfocusedContainerColor = Color(0xFFF4F4F4),
+            focusedContainerColor = AppColors.SurfaceVariant,
+            unfocusedContainerColor = AppColors.SurfaceVariant,
             focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            unfocusedIndicatorColor = Color.Transparent,
+            cursorColor = AppColors.Primary
         )
     )
 }
@@ -331,8 +320,8 @@ private fun SectionHeader(title: String, action: String? = null, onAction: () ->
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = title, fontWeight = FontWeight.Bold, color = Color(0xFF262626))
-        if (action != null) Text(text = action, color = Color(0xFF6B5BFF), modifier = Modifier.clickable(onClick = onAction))
+        Text(text = title, style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold, color = AppColors.TextPrimary))
+        if (action != null) Text(text = action, style = MaterialTheme.typography.bodyMedium.copy(color = AppColors.Primary), modifier = Modifier.clickable(onClick = onAction))
     }
 }
 
@@ -354,8 +343,8 @@ private fun CategoriesRow(onSelectCategory: (String) -> Unit) {
     }
     
     LazyRow(
-        horizontalArrangement = Arrangement.spacedBy(16.dp), 
-        contentPadding = PaddingValues(horizontal = 4.dp)
+        horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingL), 
+        contentPadding = PaddingValues(horizontal = AppDimensions.SpacingXS)
     ) {
         items(categories) { label ->
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -364,8 +353,8 @@ private fun CategoriesRow(onSelectCategory: (String) -> Unit) {
                         .size(64.dp)
                         .clickable { onSelectCategory(label) },
                     shape = CircleShape,
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+                    colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceVariant),
+                    elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.ElevationLow)
                 ) {
                     val imageName = getCategoryImageName(label)
                     val context = LocalContext.current
@@ -389,9 +378,8 @@ private fun CategoriesRow(onSelectCategory: (String) -> Unit) {
                         ) {
                             Text(
                                 text = label.first().toString(), 
-                                color = Color(0xFF262626),
-                                fontSize = 20.sp,
-                                fontWeight = FontWeight.Bold
+                                color = AppColors.TextPrimary,
+                                style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.Bold)
                             )
                         }
                     }
@@ -399,9 +387,10 @@ private fun CategoriesRow(onSelectCategory: (String) -> Unit) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = label, 
-                    fontSize = 12.sp, 
-                    color = Color(0xFF262626),
-                    fontWeight = FontWeight.Medium
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
             }
         }
@@ -413,7 +402,7 @@ private fun ProductCarousel(onProductClick: (String) -> Unit = {}) {
     val products = com.example.app.data.ProductRepository.products.collectAsState().value
     val displayProducts = products.take(3) // Show first 3 products
     
-    LazyRow(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+    LazyRow(horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingL)) {
         items(displayProducts) { product ->
             ProductCardSmall(
                 title = product.name,
@@ -438,48 +427,78 @@ private fun ProductCardSmall(
 ) {
     Card(
         modifier = Modifier
-            .size(width = 180.dp, height = 260.dp)
+            .size(width = 180.dp, height = 270.dp)
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
+        shape = RoundedCornerShape(AppDimensions.RadiusM),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.ElevationLow)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(150.dp)
-        ) {
-            com.example.app.ui.ProductImage(
-                productId = productId,
-                category = category,
-                contentDescription = title,
-                modifier = Modifier.fillMaxSize()
-            )
-        }
-        Column(modifier = Modifier.padding(12.dp)) {
-            Text(
-                text = title, 
-                fontSize = 14.sp, 
-                color = Color(0xFF262626),
-                fontWeight = FontWeight.Medium,
-                maxLines = 2,
-                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-            )
-            Spacer(modifier = Modifier.height(8.dp))
-            Text(
-                text = price, 
-                fontWeight = FontWeight.Bold, 
-                fontSize = 16.sp,
-                color = Color(0xFF262626)
-            )
-            Spacer(modifier = Modifier.height(4.dp))
-            // Stock display
-            Text(
-                text = if (stock > 0) "In Stock: $stock" else "No Stock",
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium,
-                color = if (stock > 0) Color(0xFF28A745) else Color(0xFFDC3545)
-            )
+        Column {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(160.dp)
+                    .background(AppColors.SurfaceVariant)
+            ) {
+                com.example.app.ui.ProductImage(
+                    productId = productId,
+                    category = category,
+                    contentDescription = title,
+                    modifier = Modifier.fillMaxSize()
+                )
+                
+                // Favorite button
+                Box(
+                    modifier = Modifier
+                        .padding(AppDimensions.SpacingS)
+                        .size(32.dp)
+                        .clip(CircleShape)
+                        .background(AppColors.Surface.copy(alpha = 0.8f))
+                        .align(Alignment.TopEnd),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        imageVector = Icons.Filled.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        tint = AppColors.TextPrimary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                }
+            }
+            Column(modifier = Modifier.padding(AppDimensions.SpacingM)) {
+                Text(
+                    text = title, 
+                    fontSize = 14.sp, 
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Bold,
+                    maxLines = 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
+                Text(
+                    text = price, 
+                    fontWeight = FontWeight.ExtraBold, 
+                    fontSize = 16.sp,
+                    color = AppColors.Primary
+                )
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
+                // Stock display
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(6.dp)
+                            .clip(CircleShape)
+                            .background(if (stock > 0) AppColors.Success else AppColors.Error)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = if (stock > 0) "In Stock: $stock" else "Out of Stock",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = if (stock > 0) AppColors.Success else AppColors.Error
+                    )
+                }
+            }
         }
     }
 }
@@ -497,20 +516,20 @@ private fun BottomNavBar(
         modifier = modifier
             .fillMaxWidth()
             .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.ElevationMedium)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 12.dp),
+                .padding(horizontal = AppDimensions.SpacingXXXL, vertical = AppDimensions.SpacingL),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val homeColor = if (selectedTab == "home") Color(0xFF6B5BFF) else Color(0xFF666666)
-            val ordersColor = if (selectedTab == "orders") Color(0xFF6B5BFF) else Color(0xFF666666)
-            val notificationsColor = if (selectedTab == "notifications") Color(0xFF6B5BFF) else Color(0xFF666666)
-            val profileColor = if (selectedTab == "profile") Color(0xFF6B5BFF) else Color(0xFF666666)
+            val homeColor = if (selectedTab == "home") AppColors.Primary else AppColors.TextSecondary
+            val ordersColor = if (selectedTab == "orders") AppColors.Primary else AppColors.TextSecondary
+            val notificationsColor = if (selectedTab == "notifications") AppColors.Primary else AppColors.TextSecondary
+            val profileColor = if (selectedTab == "profile") AppColors.Primary else AppColors.TextSecondary
 
         Box {
             Icon(
@@ -611,38 +630,46 @@ private fun PromotionBanner() {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp)
-            .clickable { },
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF6B5BFF)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+            .height(160.dp),
+        shape = RoundedCornerShape(AppDimensions.RadiusL),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Primary)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
-            contentAlignment = Alignment.CenterStart
-        ) {
-            Column {
+        Box(modifier = Modifier.fillMaxSize()) {
+            // Background pattern or image could go here
+            Column(
+                modifier = Modifier
+                    .padding(AppDimensions.SpacingXXL)
+                    .align(Alignment.CenterStart)
+            ) {
                 Text(
-                    text = "Special Offer",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = "Get 30% OFF",
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    text = "On all new arrivals",
+                    text = "Summer Sale",
+                    color = AppColors.TextOnPrimary.copy(alpha = 0.8f),
                     fontSize = 14.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    fontWeight = FontWeight.Bold,
+                    letterSpacing = 1.sp
                 )
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
+                Text(
+                    text = "50% OFF",
+                    color = AppColors.TextOnPrimary,
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Black
+                )
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
+                Button(
+                    onClick = { },
+                    colors = ButtonDefaults.buttonColors(containerColor = AppColors.Surface),
+                    shape = RoundedCornerShape(AppDimensions.RadiusS),
+                    contentPadding = PaddingValues(horizontal = AppDimensions.SpacingL, vertical = 0.dp),
+                    modifier = Modifier.height(36.dp)
+                ) {
+                    Text(
+                        text = "Shop Now",
+                        color = AppColors.Primary,
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
             }
         }
     }
@@ -658,8 +685,8 @@ private fun FloatingChatButton(
             .size(56.dp)
             .clickable(onClick = onClick),
         shape = CircleShape,
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF6B5BFF)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        colors = CardDefaults.cardColors(containerColor = AppColors.Primary),
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.ElevationHigh)
     ) {
         Box(
             modifier = Modifier.fillMaxSize(),
@@ -677,7 +704,7 @@ private fun FloatingChatButton(
 private fun SpecialOffersSection() {
     Column {
         SectionHeader(title = "Special Offers", action = "See All", onAction = {})
-        Spacer(modifier = Modifier.height(12.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
         
         val offers = listOf(
             Offer("Flash Sale", "Up to 50% OFF", Color(0xFFFF6B6B)),
@@ -686,7 +713,7 @@ private fun SpecialOffersSection() {
         )
         
         LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
         ) {
             items(offers) { offer ->
                 OfferCard(offer = offer)
@@ -708,28 +735,30 @@ private fun OfferCard(offer: Offer) {
             .width(200.dp)
             .height(120.dp)
             .clickable { },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(AppDimensions.RadiusL),
         colors = CardDefaults.cardColors(containerColor = offer.color),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = AppDimensions.ElevationLow)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             contentAlignment = Alignment.CenterStart
         ) {
             Column {
                 Text(
                     text = offer.title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = offer.subtitle,
-                    fontSize = 12.sp,
-                    color = Color.White.copy(alpha = 0.9f)
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        color = Color.White.copy(alpha = 0.9f)
+                    )
                 )
             }
         }

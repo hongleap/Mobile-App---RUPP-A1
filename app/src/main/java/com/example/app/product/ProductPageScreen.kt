@@ -48,6 +48,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 
 data class Product(
     val id: String,
@@ -106,14 +109,14 @@ fun ProductPageScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(AppColors.Background)
                 .verticalScroll(scrollState)
         ) {
             // Header with back and favorite buttons
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingM),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -121,14 +124,14 @@ fun ProductPageScreen(
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color(0xFF262626)
+                        tint = AppColors.TextPrimary
                     )
                 }
                 IconButton(onClick = { isFavorite = !isFavorite }) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                         contentDescription = "Favorite",
-                        tint = if (isFavorite) Color(0xFFFF0000) else Color(0xFF262626)
+                        tint = if (isFavorite) AppColors.AccentRed else AppColors.TextPrimary
                     )
                 }
             }
@@ -139,28 +142,30 @@ fun ProductPageScreen(
                    // Product details
                    Card(
                        modifier = Modifier.fillMaxWidth(),
-                       colors = CardDefaults.cardColors(containerColor = Color.White),
+                       colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                    ) {
                        Column(
                            modifier = Modifier
                                .fillMaxWidth()
-                               .padding(16.dp)
+                               .padding(AppDimensions.SpacingL)
                        ) {
                 Text(
                     text = product.name,
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleLarge.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
                 Text(
                     text = product.price,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.headlineSmall.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -168,9 +173,10 @@ fun ProductPageScreen(
                 // Stock display
                 Text(
                     text = if (product.stock > 0) "In Stock: ${product.stock}" else "No Stock",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = if (product.stock > 0) Color(0xFF28A745) else Color(0xFFDC3545)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = if (product.stock > 0) AppColors.Primary else AppColors.AccentRed,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
                 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -207,9 +213,10 @@ fun ProductPageScreen(
                 // Description
                 Text(
                     text = product.description,
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666),
-                    lineHeight = 20.sp
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextSecondary,
+                        lineHeight = 20.sp
+                    )
                 )
                 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -217,15 +224,17 @@ fun ProductPageScreen(
                 // Shipping & Returns
                 Text(
                     text = "Shipping & Returns",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = "Free standard shipping and free 60-day returns.",
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextSecondary
+                    )
                 )
                        }
                    }
@@ -315,9 +324,9 @@ private fun SizeColorSelector(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusM))
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+        colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceVariant)
     ) {
         Row(
             modifier = Modifier
@@ -328,8 +337,9 @@ private fun SizeColorSelector(
         ) {
             Text(
                 text = label,
-                fontSize = 16.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = AppColors.TextPrimary
+                )
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -345,15 +355,16 @@ private fun SizeColorSelector(
                 }
                 Text(
                     text = value,
-                    fontSize = 16.sp,
-                    color = Color(0xFF262626),
-                    fontWeight = FontWeight.Medium
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
                 Icon(
                     imageVector = Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    modifier = Modifier.size(16.dp),
-                    tint = Color(0xFF666666)
+                    modifier = Modifier.size(AppDimensions.IconSmall),
+                    tint = AppColors.TextSecondary
                 )
             }
         }
@@ -369,8 +380,8 @@ private fun QuantitySelector(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+            .clip(RoundedCornerShape(AppDimensions.RadiusM)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceVariant)
     ) {
         Row(
             modifier = Modifier
@@ -381,43 +392,45 @@ private fun QuantitySelector(
         ) {
             Text(
                 text = "Quantity",
-                fontSize = 16.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = AppColors.TextPrimary
+                )
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingL)
             ) {
                 IconButton(
                     onClick = onDecrease,
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF2D2D2D))
+                        .background(AppColors.Primary)
                 ) {
                     Text(
                         text = "−",
-                        color = Color.White,
-                        fontSize = 20.sp
+                        color = AppColors.TextOnPrimary,
+                        style = MaterialTheme.typography.titleMedium
                     )
                 }
                 Text(
                     text = quantity.toString(),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
                 IconButton(
                     onClick = onIncrease,
                     modifier = Modifier
                         .size(32.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFF2D2D2D))
+                        .background(AppColors.Primary)
                 ) {
                     Text(
                         text = "+",
-                        color = Color.White,
-                        fontSize = 20.sp
+                        color = AppColors.TextOnPrimary,
+                        style = MaterialTheme.typography.titleMedium
                     )
                 }
             }
@@ -434,8 +447,8 @@ private fun BottomActionBar(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+            .clip(RoundedCornerShape(topStart = AppDimensions.RadiusL, topEnd = AppDimensions.RadiusL)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Primary)
     ) {
         Row(
             modifier = Modifier
@@ -446,22 +459,24 @@ private fun BottomActionBar(
         ) {
             Text(
                 text = price,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = AppColors.TextOnPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
             Card(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(AppDimensions.RadiusM))
                     .clickable(onClick = onAddToBag),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+                colors = CardDefaults.cardColors(containerColor = AppColors.Primary)
             ) {
                 Text(
                     text = "Add to Bag",
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color.White
+                    modifier = Modifier.padding(horizontal = AppDimensions.SpacingXXXL, vertical = AppDimensions.SpacingL),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = AppColors.TextOnPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
             }
         }
@@ -487,9 +502,10 @@ private fun SizeSelectionModal(
         ) {
             Text(
                 text = "Size",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
             IconButton(onClick = onClose) {
                 Icon(
@@ -537,15 +553,16 @@ private fun SizeOptionRow(
         ) {
             Text(
                 text = size,
-                fontSize = 16.sp,
-                color = if (isSelected) Color.White else Color(0xFF262626),
-                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = if (isSelected) AppColors.TextOnPrimary else AppColors.TextPrimary,
+                    fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+                )
             )
             if (isSelected) {
                 Text(
                     text = "✓",
-                    color = Color.White,
-                    fontSize = 18.sp
+                    color = AppColors.TextOnPrimary,
+                    style = MaterialTheme.typography.titleLarge
                 )
             }
         }
@@ -571,9 +588,10 @@ private fun ColorSelectionModal(
         ) {
             Text(
                 text = "Color",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
             IconButton(onClick = onClose) {
                 Icon(
@@ -621,9 +639,10 @@ private fun ColorOptionRow(
         ) {
             Text(
                 text = color.name,
-                fontSize = 16.sp,
-                color = if (isSelected) Color.White else Color(0xFF262626),
-                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = if (isSelected) AppColors.TextOnPrimary else AppColors.TextPrimary,
+                    fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+                )
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -638,8 +657,8 @@ private fun ColorOptionRow(
                 if (isSelected) {
                     Text(
                         text = "✓",
-                        color = Color.White,
-                        fontSize = 18.sp
+                        color = AppColors.TextOnPrimary,
+                        style = MaterialTheme.typography.titleLarge
                     )
                 }
             }

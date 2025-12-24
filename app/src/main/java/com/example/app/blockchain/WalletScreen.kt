@@ -18,6 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import com.example.app.blockchain.config.TokenConfig
 import com.example.app.blockchain.data.TokenTransaction
 import com.example.app.blockchain.data.TransactionStatus
@@ -84,28 +86,48 @@ fun WalletScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Wallet") },
+                title = { 
+                    Text(
+                        "Wallet",
+                        style = MaterialTheme.typography.titleLarge.copy(
+                            color = AppColors.TextPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
+                    ) 
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, "Back")
+                        Icon(
+                            Icons.Default.ArrowBack, 
+                            "Back",
+                            tint = AppColors.TextPrimary
+                        )
                     }
                 },
                 actions = {
                     if (walletAddress != null) {
                         IconButton(onClick = { loadBalances() }) {
-                            Icon(Icons.Default.Refresh, "Refresh")
+                            Icon(
+                                Icons.Default.Refresh, 
+                                "Refresh",
+                                tint = AppColors.TextPrimary
+                            )
                         }
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = AppColors.Background
+                )
             )
         }
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(AppColors.Background)
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (walletAddress == null) {
@@ -113,25 +135,29 @@ fun WalletScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 32.dp),
-                    shape = RoundedCornerShape(16.dp)
+                        .padding(vertical = AppDimensions.SpacingXXXL),
+                    shape = RoundedCornerShape(AppDimensions.RadiusL),
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Surface)
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp),
+                        modifier = Modifier.padding(AppDimensions.SpacingXXXL),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
                             text = "Connect Wallet",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.headlineSmall.copy(
+                                color = AppColors.TextPrimary,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                         Spacer(modifier = Modifier.height(16.dp))
                         Text(
                             text = "Enter your BNB Smart Chain wallet address to view your token balance",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = AppColors.TextSecondary
+                            )
                         )
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
                         
                         // Connect with MetaMask button
                         if (MetaMaskService.isMetaMaskInstalled(context)) {
@@ -149,7 +175,12 @@ fun WalletScreen(
                                         errorMessage = "Failed to open MetaMask. Please enter address manually."
                                     }
                                 },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.buttonColors(
+                                    containerColor = AppColors.Primary,
+                                    contentColor = AppColors.TextOnPrimary
+                                ),
+                                shape = RoundedCornerShape(AppDimensions.RadiusM)
                             ) {
                                 Text("Connect with MetaMask")
                             }
@@ -182,7 +213,11 @@ fun WalletScreen(
                                         context.startActivity(intent)
                                     }
                                 },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
+                                colors = ButtonDefaults.outlinedButtonColors(
+                                    contentColor = AppColors.Primary
+                                ),
+                                shape = RoundedCornerShape(AppDimensions.RadiusM)
                             ) {
                                 Text("Install MetaMask")
                             }
@@ -205,7 +240,12 @@ fun WalletScreen(
                             label = { Text("Enter Wallet Address Manually") },
                             placeholder = { Text("0x...") },
                             modifier = Modifier.fillMaxWidth(),
-                            singleLine = true
+                            singleLine = true,
+                            shape = RoundedCornerShape(AppDimensions.RadiusM),
+                            colors = TextFieldDefaults.outlinedTextFieldColors(
+                                focusedBorderColor = AppColors.Primary,
+                                unfocusedBorderColor = AppColors.SurfaceVariant
+                            )
                         )
                         
                         Spacer(modifier = Modifier.height(16.dp))
@@ -221,7 +261,12 @@ fun WalletScreen(
                                 }
                             },
                             modifier = Modifier.fillMaxWidth(),
-                            enabled = addressInput.isNotBlank()
+                            enabled = addressInput.isNotBlank(),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = AppColors.Primary,
+                                contentColor = AppColors.TextOnPrimary
+                            ),
+                            shape = RoundedCornerShape(AppDimensions.RadiusM)
                         ) {
                             Text("Connect Wallet")
                         }
@@ -232,10 +277,10 @@ fun WalletScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    shape = RoundedCornerShape(16.dp),
+                        .padding(bottom = AppDimensions.SpacingL),
+                    shape = RoundedCornerShape(AppDimensions.RadiusL),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                        containerColor = AppColors.PrimaryLight.copy(alpha = 0.1f)
                     )
                 ) {
                     Column(
@@ -243,22 +288,30 @@ fun WalletScreen(
                     ) {
                         Text(
                             text = "Connected Wallet",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                color = AppColors.TextPrimary,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = WalletManager.getShortAddress(walletAddress!!),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Gray
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                color = AppColors.TextSecondary
+                            )
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-                        TextButton(onClick = {
-                            WalletManager.clearWallet(context)
-                            walletAddress = null
-                            tokenBalance = null
-                            bnbBalance = null
-                        }) {
+                        TextButton(
+                            onClick = {
+                                WalletManager.clearWallet(context)
+                                walletAddress = null
+                                tokenBalance = null
+                                bnbBalance = null
+                            },
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = AppColors.AccentRed
+                            )
+                        ) {
                             Text("Disconnect")
                         }
                     }
@@ -276,8 +329,9 @@ fun WalletScreen(
                     ) {
                         Text(
                             text = "${TokenConfig.TOKEN_SYMBOL} Balance",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.Gray
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                color = AppColors.TextSecondary
+                            )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         if (isLoading) {
@@ -287,8 +341,10 @@ fun WalletScreen(
                                 text = tokenBalance?.let { 
                                     TokenService.formatTokenAmount(it) 
                                 } ?: "0",
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    color = AppColors.TextPrimary,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
                         }
                     }
@@ -306,8 +362,9 @@ fun WalletScreen(
                     ) {
                         Text(
                             text = "BNB Balance",
-                            style = MaterialTheme.typography.titleMedium,
-                            color = Color.Gray
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                color = AppColors.TextSecondary
+                            )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         if (isLoading) {
@@ -317,8 +374,10 @@ fun WalletScreen(
                                 text = bnbBalance?.let { 
                                     TokenService.formatTokenAmount(it) 
                                 } ?: "0",
-                                style = MaterialTheme.typography.headlineMedium,
-                                fontWeight = FontWeight.Bold
+                                style = MaterialTheme.typography.headlineMedium.copy(
+                                    color = AppColors.TextPrimary,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
                         }
                     }
@@ -328,18 +387,27 @@ fun WalletScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        .padding(bottom = AppDimensions.SpacingL),
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
                 ) {
                     Button(
                         onClick = onTransferClick,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = AppColors.Primary,
+                            contentColor = AppColors.TextOnPrimary
+                        ),
+                        shape = RoundedCornerShape(AppDimensions.RadiusM)
                     ) {
                         Text("Transfer")
                     }
                     OutlinedButton(
                         onClick = { showTransactionHistory = !showTransactionHistory },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = AppColors.Primary
+                        ),
+                        shape = RoundedCornerShape(AppDimensions.RadiusM)
                     ) {
                         Text("History")
                     }
@@ -350,30 +418,34 @@ fun WalletScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(bottom = 16.dp),
-                        shape = RoundedCornerShape(16.dp)
+                            .padding(bottom = AppDimensions.SpacingL),
+                        shape = RoundedCornerShape(AppDimensions.RadiusL),
+                        colors = CardDefaults.cardColors(containerColor = AppColors.Surface)
                     ) {
                         Column(
-                            modifier = Modifier.padding(20.dp)
+                            modifier = Modifier.padding(AppDimensions.SpacingL)
                         ) {
                             Text(
                                 text = "Transaction History",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    color = AppColors.TextPrimary,
+                                    fontWeight = FontWeight.Bold
+                                )
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                             
                             if (transactions.isEmpty()) {
                                 Text(
                                     text = "No transactions yet",
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    color = Color.Gray,
-                                    modifier = Modifier.padding(vertical = 16.dp)
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        color = AppColors.TextTertiary
+                                    ),
+                                    modifier = Modifier.padding(vertical = AppDimensions.SpacingL)
                                 )
                             } else {
                                 transactions.take(10).forEach { transaction ->
                                     TransactionItem(transaction)
-                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
                                 }
                             }
                         }
@@ -383,15 +455,18 @@ fun WalletScreen(
                 // Token Info
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(16.dp)
+                    shape = RoundedCornerShape(AppDimensions.RadiusL),
+                    colors = CardDefaults.cardColors(containerColor = AppColors.Surface)
                 ) {
                     Column(
                         modifier = Modifier.padding(20.dp)
                     ) {
                         Text(
                             text = "Token Information",
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                color = AppColors.TextPrimary,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         InfoRow("Name", TokenConfig.TOKEN_NAME)
@@ -404,17 +479,20 @@ fun WalletScreen(
             
             // Error message
             errorMessage?.let { error ->
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
-                    )
+                        containerColor = AppColors.AccentRed.copy(alpha = 0.1f)
+                    ),
+                    shape = RoundedCornerShape(AppDimensions.RadiusM)
                 ) {
                     Text(
                         text = error,
-                        modifier = Modifier.padding(16.dp),
-                        color = MaterialTheme.colorScheme.onErrorContainer
+                        modifier = Modifier.padding(AppDimensions.SpacingL),
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = AppColors.AccentRed
+                        )
                     )
                 }
             }
@@ -427,18 +505,21 @@ private fun InfoRow(label: String, value: String) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = AppDimensions.SpacingXS),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         Text(
             text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = Color.Gray
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = AppColors.TextSecondary
+            )
         )
         Text(
             text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = AppColors.TextPrimary,
+                fontWeight = FontWeight.Medium
+            )
         )
     }
 }
@@ -450,16 +531,17 @@ private fun TransactionItem(transaction: TokenTransaction) {
     
     Card(
         modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(AppDimensions.RadiusM),
         colors = CardDefaults.cardColors(
             containerColor = when (transaction.status) {
-                TransactionStatus.COMPLETED -> Color(0xFFE8F5E9)
-                TransactionStatus.FAILED -> Color(0xFFFFEBEE)
-                TransactionStatus.PENDING -> Color(0xFFFFF3E0)
+                TransactionStatus.COMPLETED -> AppColors.PrimaryLight.copy(alpha = 0.1f)
+                TransactionStatus.FAILED -> AppColors.AccentRed.copy(alpha = 0.1f)
+                TransactionStatus.PENDING -> AppColors.PrimaryLight.copy(alpha = 0.05f)
             }
         )
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(AppDimensions.SpacingM)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -473,19 +555,23 @@ private fun TransactionItem(transaction: TokenTransaction) {
                             TransactionType.RECEIVE -> "Received"
                             TransactionType.PAYMENT -> "Payment"
                         },
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = AppColors.TextPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
                     Text(
                         text = "${TokenService.formatTokenAmount(transaction.amount)} ${TokenConfig.TOKEN_SYMBOL}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.TextSecondary
+                        )
                     )
                     Text(
                         text = "To: ${WalletManager.getShortAddress(transaction.toAddress)}",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray,
-                        fontSize = 10.sp
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.TextTertiary,
+                            fontSize = 10.sp
+                        )
                     )
                 }
                 Column(
@@ -493,20 +579,22 @@ private fun TransactionItem(transaction: TokenTransaction) {
                 ) {
                     Text(
                         text = dateString,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = Color.Gray,
-                        fontSize = 10.sp
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.TextTertiary,
+                            fontSize = 10.sp
+                        )
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                     Text(
                         text = transaction.status.name,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = when (transaction.status) {
-                            TransactionStatus.COMPLETED -> Color(0xFF4CAF50)
-                            TransactionStatus.FAILED -> Color(0xFFF44336)
-                            TransactionStatus.PENDING -> Color(0xFFFF9800)
-                        },
-                        fontSize = 10.sp
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = when (transaction.status) {
+                                TransactionStatus.COMPLETED -> AppColors.Primary
+                                TransactionStatus.FAILED -> AppColors.AccentRed
+                                TransactionStatus.PENDING -> AppColors.PrimaryLight
+                            },
+                            fontSize = 10.sp
+                        )
                     )
                 }
             }

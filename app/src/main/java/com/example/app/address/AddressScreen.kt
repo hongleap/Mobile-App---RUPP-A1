@@ -37,6 +37,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import com.example.app.profile.data.Address
 import com.example.app.profile.data.UserProfileRepository
 import kotlinx.coroutines.launch
@@ -73,13 +75,13 @@ fun AddressScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
         // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingXXL),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -87,16 +89,15 @@ fun AddressScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
             Text(
                 text = "Address",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                ),
-                color = Color(0xFF262626)
+                    color = AppColors.TextPrimary
+                )
             )
             Spacer(modifier = Modifier.size(48.dp))
         }
@@ -106,23 +107,25 @@ fun AddressScreen(
                 .weight(1f)
                 .fillMaxWidth()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = AppDimensions.SpacingL)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
 
             if (isLoading) {
                 Text(
                     text = "Loading addresses...",
-                    fontSize = 16.sp,
-                    color = Color(0xFF666666),
-                    modifier = Modifier.padding(16.dp)
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = AppColors.TextSecondary
+                    ),
+                    modifier = Modifier.padding(AppDimensions.SpacingL)
                 )
             } else if (addresses.isEmpty()) {
                 Text(
                     text = "No addresses saved. Tap + to add one.",
-                    fontSize = 16.sp,
-                    color = Color(0xFF666666),
-                    modifier = Modifier.padding(16.dp)
+                    style = MaterialTheme.typography.bodyLarge.copy(
+                        color = AppColors.TextSecondary
+                    ),
+                    modifier = Modifier.padding(AppDimensions.SpacingL)
                 )
             } else {
                 addresses.forEach { address ->
@@ -130,25 +133,25 @@ fun AddressScreen(
                         address = address,
                         onEdit = { onEditAddress(address.id) }
                     )
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
                 }
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
         }
         
         // Add button
         FloatingActionButton(
             onClick = onAddAddress,
             modifier = Modifier
-                .padding(16.dp)
+                .padding(AppDimensions.SpacingL)
                 .align(Alignment.End),
-            containerColor = Color(0xFF262626)
+            containerColor = AppColors.Primary
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = "Add Address",
-                tint = Color.White
+                tint = AppColors.TextOnPrimary
             )
         }
     }
@@ -162,68 +165,77 @@ private fun AddressItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+            .clip(RoundedCornerShape(AppDimensions.RadiusL)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceVariant)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = address.fullName,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
+                    )
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = address.addressLine1,
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextSecondary
+                    )
                 )
                 if (address.addressLine2.isNotEmpty()) {
                     Text(
                         text = address.addressLine2,
-                        fontSize = 14.sp,
-                        color = Color(0xFF666666)
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = AppColors.TextSecondary
+                        )
                     )
                 }
                 Text(
                     text = "${address.city}, ${address.state} ${address.zipCode}",
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextSecondary
+                    )
                 )
                 Text(
                     text = address.country,
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextSecondary
+                    )
                 )
                 if (address.phoneNumber.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                     Text(
                         text = "Phone: ${address.phoneNumber}",
-                        fontSize = 14.sp,
-                        color = Color(0xFF666666)
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = AppColors.TextSecondary
+                        )
                     )
                 }
                 if (address.isDefault) {
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                     Text(
                         text = "Default Address",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4CAF50)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.Primary
+                        )
                     )
                 }
             }
             Text(
                 text = "Edit",
-                fontSize = 14.sp,
-                color = Color(0xFF262626),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.Primary,
+                    fontWeight = FontWeight.Bold
+                ),
                 modifier = Modifier.clickable(onClick = onEdit)
             )
         }

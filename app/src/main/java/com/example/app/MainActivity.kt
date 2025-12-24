@@ -76,7 +76,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            MaterialTheme(
+            val isDarkTheme = androidx.compose.foundation.isSystemInDarkTheme()
+            val colorScheme = if (isDarkTheme) com.example.app.ui.AppDarkColorScheme else com.example.app.ui.AppLightColorScheme
+            
+            androidx.compose.material3.MaterialTheme(
+                colorScheme = colorScheme,
                 typography = com.example.app.ui.AppTypography
             ) {
                 Surface(
@@ -136,7 +140,6 @@ fun MainScreen() {
     // Load products from Firestore
     val scope = rememberCoroutineScope()
     val productsState = ProductRepository.products.collectAsState()
-    val isLoading = ProductRepository.isLoading.collectAsState()
     
     // Load orders and notifications from Firestore
     LaunchedEffect(isUserSignedIn) {
@@ -211,8 +214,8 @@ fun MainScreen() {
         // Login screens
         AnimatedVisibility(
             visible = currentScreen == "login",
-            enter = slideInHorizontally(initialOffsetX = { -it }),
-            exit = slideOutHorizontally(targetOffsetX = { -it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { -it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { -it })
         ) {
             Login(
                 onContinue = { 
@@ -240,8 +243,8 @@ fun MainScreen() {
         
         AnimatedVisibility(
             visible = currentScreen == "create_account",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
         ) {
             CreateAccountScreen(
                 onBackClick = { currentScreen = "login" },
@@ -258,8 +261,8 @@ fun MainScreen() {
         
         AnimatedVisibility(
             visible = currentScreen == "forgot_password",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
         ) {
             ForgotPasswordScreen(
                 onBackClick = { currentScreen = "login" },
@@ -270,8 +273,8 @@ fun MainScreen() {
         
         AnimatedVisibility(
             visible = currentScreen == "reset_confirmation",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
         ) {
             PasswordResetConfirmationScreen(
                 onBackClick = { currentScreen = "forgot_password" },
@@ -281,8 +284,8 @@ fun MainScreen() {
         
         AnimatedVisibility(
             visible = currentScreen == "onboarding",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
         ) {
             OnboardingScreen(
                 onBackClick = { currentScreen = "login" },
@@ -297,8 +300,8 @@ fun MainScreen() {
             Box(modifier = Modifier.fillMaxSize()) {
                 AnimatedVisibility(
                     visible = currentScreen == "home",
-                    enter = slideInHorizontally(initialOffsetX = { -it }),
-                    exit = slideOutHorizontally(targetOffsetX = { -it })
+                    enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { -it }),
+                    exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { -it })
                 ) {
                     HomeScreen(
                         onSeeAllCategories = { currentScreen = "categories" },
@@ -340,8 +343,8 @@ fun MainScreen() {
                 
                 AnimatedVisibility(
                     visible = currentScreen == "orders" || currentScreen == "track_order",
-                    enter = slideInHorizontally(initialOffsetX = { -it }),
-                    exit = slideOutHorizontally(targetOffsetX = { -it })
+                    enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+                    exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
                 ) {
                     OrdersScreen(
                         orders = orders,
@@ -359,8 +362,8 @@ fun MainScreen() {
 
                 AnimatedVisibility(
                     visible = currentScreen == "notifications",
-                    enter = slideInHorizontally(initialOffsetX = { -it }),
-                    exit = slideOutHorizontally(targetOffsetX = { -it })
+                    enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+                    exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
                 ) {
                     NotificationsScreen(
                         notifications = notifications,
@@ -374,8 +377,8 @@ fun MainScreen() {
                 
                 AnimatedVisibility(
                     visible = currentScreen == "profile",
-                    enter = slideInHorizontally(initialOffsetX = { -it }),
-                    exit = slideOutHorizontally(targetOffsetX = { -it })
+                    enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+                    exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
                 ) {
                     ProfileScreen(
                         userName = currentUser?.displayName ?: currentUser?.email?.substringBefore("@")?.replaceFirstChar { it.uppercase() } ?: "User",
@@ -429,8 +432,8 @@ fun MainScreen() {
         
         AnimatedVisibility(
             visible = currentScreen == "categories",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
         ) {
             CategoriesScreen(
                 onBackClick = { currentScreen = "home" },
@@ -443,8 +446,8 @@ fun MainScreen() {
         
         AnimatedVisibility(
             visible = currentScreen == "category_detail",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
         ) {
             CategoryDetailScreen(
                 category = email.ifEmpty { "Category" },
@@ -462,8 +465,8 @@ fun MainScreen() {
         
         AnimatedVisibility(
             visible = currentScreen == "cart",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
         ) {
             CartScreen(
                 cartItems = cartItems,
@@ -506,8 +509,8 @@ fun MainScreen() {
         
         AnimatedVisibility(
             visible = currentScreen == "search",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
         ) {
             SearchScreen(
                 initialQuery = searchQuery,
@@ -529,8 +532,8 @@ fun MainScreen() {
         
         AnimatedVisibility(
             visible = currentScreen == "search_results" || currentScreen == "search_filters",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
         ) {
             SearchResultsScreen(
                 searchQuery = searchQuery,
@@ -559,8 +562,8 @@ fun MainScreen() {
         // Product Page
         AnimatedVisibility(
             visible = currentScreen == "product_page",
-            enter = slideInHorizontally(initialOffsetX = { it }),
-            exit = slideOutHorizontally(targetOffsetX = { it })
+            enter = androidx.compose.animation.fadeIn() + slideInHorizontally(initialOffsetX = { it }),
+            exit = androidx.compose.animation.fadeOut() + slideOutHorizontally(targetOffsetX = { it })
         ) {
             selectedProduct?.let { product ->
                 ProductPageScreen(
@@ -593,7 +596,7 @@ fun MainScreen() {
             val tax = 0.0
             
             // Load default address and payment method
-            val scope = rememberCoroutineScope()
+            val checkoutScope = rememberCoroutineScope()
             val context = LocalContext.current
             var shippingAddress by remember { mutableStateOf<String?>(null) }
             var paymentMethod by remember { mutableStateOf<String?>(null) }
@@ -601,7 +604,7 @@ fun MainScreen() {
             // Reload data when screen becomes visible
             LaunchedEffect(currentScreen) {
                 if (currentScreen == "checkout") {
-                    scope.launch {
+                    checkoutScope.launch {
                         // Load default address
                         val addressesResult = com.example.app.profile.data.UserProfileRepository.getAddresses()
                         addressesResult.onSuccess { addresses ->
@@ -685,7 +688,7 @@ fun MainScreen() {
                     currentScreen = "token_transfer" 
                 },
                 onVerifyClick = {
-                    scope.launch {
+                    checkoutScope.launch {
                         val (isVerified, debugMsg) = com.example.app.blockchain.PaymentVerification.verifyPendingPayment(context)
                         if (isVerified) {
                             paymentVerified = true
@@ -713,7 +716,7 @@ fun MainScreen() {
                         }
                     }
                     
-                    scope.launch {
+                    checkoutScope.launch {
                         // Create order from cart items
                         val orderItems = cartItems.map { item ->
                             OrderItem(
@@ -726,10 +729,10 @@ fun MainScreen() {
                                 category = item.category
                             )
                         }
-                        val subtotal = cartItems.sumOf { it.price * it.quantity }
-                        val shippingCost = 8.0
-                        val tax = 0.0
-                        val total = subtotal + shippingCost + tax
+                        val orderSubtotal = cartItems.sumOf { it.price * it.quantity }
+                        val orderShippingCost = 8.0
+                        val orderTax = 0.0
+                        val orderTotal = orderSubtotal + orderShippingCost + orderTax
                         
                         val orderNumber = OrderRepository.generateOrderNumber()
                         val customerName = currentUser?.displayName ?: currentUser?.email?.substringBefore("@")?.replaceFirstChar { it.uppercase() } ?: "User"
@@ -746,7 +749,7 @@ fun MainScreen() {
                         val orderResult = OrderRepository.createOrder(
                             orderNumber = orderNumber,
                             items = orderItems,
-                            total = total,
+                            total = orderTotal,
                             customerName = customerName,
                             customerEmail = customerEmail,
                             shippingAddress = shippingAddressText,
@@ -754,14 +757,14 @@ fun MainScreen() {
                             status = "Processing"
                         )
                         
-                        orderResult.onSuccess { orderId ->
+                        orderResult.onSuccess { _ ->
                             // Mark transaction as consumed and clear payment verification after successful order
                             if (selectedPaymentType == "token") {
-                                scope.launch {
+                                checkoutScope.launch {
                                     // Get the transaction hash and amount before clearing
                                     val txHash = com.example.app.blockchain.PaymentVerification.getPendingPaymentHash(context)
                                     if (txHash != null) {
-                                        val total = subtotal + shippingCost + tax
+                                        val total = orderSubtotal + orderShippingCost + orderTax
                                         val totalAmount = java.math.BigDecimal(total.toString())
                                         // Mark as consumed to prevent reuse (saves to both local and server)
                                         com.example.app.blockchain.PaymentVerification.markTransactionAsConsumed(context, txHash, totalAmount)
@@ -996,7 +999,6 @@ fun MainScreen() {
             exit = slideOutHorizontally(targetOffsetX = { it })
         ) {
             val context = LocalContext.current
-            val walletAddress = com.example.app.blockchain.WalletManager.getWalletAddress(context)
             val totalAmount = if (previousScreen == "checkout") {
                 val subtotal = cartItems.sumOf { it.price * it.quantity }
                 val shippingCost = 8.0
@@ -1022,14 +1024,14 @@ fun MainScreen() {
                         val shippingCost = 8.0
                         val tax = 0.0
                         val total = subtotal + shippingCost + tax
-                        val totalAmount = java.math.BigDecimal(total.toString())
+                        val transferTotalAmount = java.math.BigDecimal(total.toString())
                         
                         // Mark payment as pending (will be verified when MetaMask confirms)
                         val fromAddress = com.example.app.blockchain.WalletManager.getWalletAddress(context) ?: ""
                         com.example.app.blockchain.PaymentVerification.setPendingPayment(
                             context = context,
                             transactionHash = txHash,
-                            amount = totalAmount,
+                            amount = transferTotalAmount,
                             recipientAddress = com.example.app.blockchain.config.TokenConfig.STORE_WALLET_ADDRESS,
                             fromAddress = fromAddress
                         )

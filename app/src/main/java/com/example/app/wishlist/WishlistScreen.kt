@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -33,6 +34,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 data class WishlistCategory(
     val id: String,
@@ -54,19 +57,19 @@ fun WishlistScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2D2D2D))
+            .background(AppColors.Primary)
     ) {
         // White content card
         Card(
             modifier = Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp)),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
+                .clip(RoundedCornerShape(topStart = AppDimensions.RadiusXXL, topEnd = AppDimensions.RadiusXXL)),
+            colors = CardDefaults.cardColors(containerColor = AppColors.Background)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(AppDimensions.SpacingL)
             ) {
                 // Header
                 Row(
@@ -78,16 +81,15 @@ fun WishlistScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color(0xFF262626)
+                            tint = AppColors.TextPrimary
                         )
                     }
                     Text(
                         text = "Wishlist",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
-                        ),
-                        color = Color(0xFF262626)
+                            color = AppColors.TextPrimary
+                        )
                     )
                     Spacer(modifier = Modifier.size(48.dp))
                 }
@@ -97,14 +99,14 @@ fun WishlistScreen(
                         .weight(1f)
                         .fillMaxWidth()
                         .verticalScroll(scrollState)
-                        .padding(vertical = 16.dp)
+                        .padding(vertical = AppDimensions.SpacingL)
                 ) {
                     categories.forEach { category ->
                         WishlistCategoryItem(
                             category = category,
                             onClick = { onCategoryClick(category.id) }
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
                     }
                 }
             }
@@ -120,46 +122,48 @@ private fun WishlistCategoryItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusL))
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0))
+        colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceVariant)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
             ) {
                 Icon(
                     imageVector = Icons.Default.FavoriteBorder,
                     contentDescription = "Favorite",
-                    tint = Color(0xFF262626),
-                    modifier = Modifier.size(24.dp)
+                    tint = AppColors.TextPrimary,
+                    modifier = Modifier.size(AppDimensions.IconM)
                 )
                 Column {
                     Text(
                         text = category.name,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF262626)
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.TextPrimary
+                        )
                     )
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                     Text(
                         text = "${category.productCount} Products",
-                        fontSize = 14.sp,
-                        color = Color(0xFF999999)
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = AppColors.TextSecondary
+                        )
                     )
                 }
             }
             Icon(
                 imageVector = Icons.Default.KeyboardArrowRight,
                 contentDescription = "View",
-                tint = Color(0xFF262626)
+                tint = AppColors.TextPrimary
             )
         }
     }

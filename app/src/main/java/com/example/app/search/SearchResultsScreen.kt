@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -56,6 +57,8 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 data class SearchProduct(
     val id: String,
@@ -115,7 +118,7 @@ fun SearchResultsScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color(0xFFF5F5F5))
+                .background(AppColors.Background)
         ) {
             Spacer(modifier = Modifier.height(8.dp))
             
@@ -123,14 +126,14 @@ fun SearchResultsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
+                    .padding(horizontal = AppDimensions.SpacingL),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color(0xFF262626)
+                        tint = AppColors.TextPrimary
                     )
                 }
 
@@ -139,15 +142,15 @@ fun SearchResultsScreen(
                     onValueChange = { queryText = it },
                     modifier = Modifier
                         .weight(1f)
-                        .clip(RoundedCornerShape(24.dp))
-                        .background(Color(0xFFF4F4F4)),
+                        .clip(RoundedCornerShape(AppDimensions.RadiusXL))
+                        .background(AppColors.SurfaceVariant),
                     placeholder = { Text("Search") },
                     leadingIcon = {
                         IconButton(onClick = { onSearch.invoke(queryText) }) {
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "Search",
-                                tint = Color(0xFF666666)
+                                tint = AppColors.TextSecondary
                             )
                         }
                     },
@@ -161,7 +164,7 @@ fun SearchResultsScreen(
                                     Icon(
                                         imageVector = Icons.Default.Close,
                                         contentDescription = "Clear",
-                                        tint = Color(0xFF666666)
+                                        tint = AppColors.TextSecondary
                                     )
                                 }
                             }
@@ -169,14 +172,14 @@ fun SearchResultsScreen(
                                 Icon(
                                     imageVector = Icons.Default.MoreVert,
                                     contentDescription = "Filters",
-                                    tint = Color(0xFF666666)
+                                    tint = AppColors.TextSecondary
                                 )
                             }
                         }
                     },
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFF4F4F4),
-                        unfocusedContainerColor = Color(0xFFF4F4F4),
+                        focusedContainerColor = AppColors.SurfaceVariant,
+                        unfocusedContainerColor = AppColors.SurfaceVariant,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     ),
@@ -195,25 +198,25 @@ fun SearchResultsScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    .padding(horizontal = AppDimensions.SpacingL),
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingS)
             ) {
                 // Filter icon chip
                 Card(
                     modifier = Modifier
-                        .clip(RoundedCornerShape(20.dp)),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFFE0E0E0))
+                        .clip(RoundedCornerShape(AppDimensions.RadiusXL)),
+                    colors = CardDefaults.cardColors(containerColor = AppColors.SurfaceVariant)
                 ) {
                     Row(
-                        modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+                        modifier = Modifier.padding(horizontal = AppDimensions.SpacingM, vertical = AppDimensions.SpacingS),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                        horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingXS)
                     ) {
-                        Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFF262626))
+                        Icon(Icons.Default.Search, contentDescription = null, modifier = Modifier.size(AppDimensions.IconXS), tint = AppColors.TextPrimary)
                         Text(
                             text = if (activeFiltersCount > 0) "$activeFiltersCount" else "Filter",
-                            color = Color(0xFF262626),
-                            fontSize = 12.sp
+                            color = AppColors.TextPrimary,
+                            style = MaterialTheme.typography.bodySmall
                         )
                     }
                 }
@@ -241,9 +244,10 @@ fun SearchResultsScreen(
             // Results count
             Text(
                 text = "${products.size} Results Found",
-                modifier = Modifier.padding(horizontal = 16.dp),
-                fontSize = 14.sp,
-                color = Color(0xFF666666)
+                modifier = Modifier.padding(horizontal = AppDimensions.SpacingL),
+                style = MaterialTheme.typography.bodySmall.copy(
+                    color = AppColors.TextSecondary
+                )
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -251,9 +255,9 @@ fun SearchResultsScreen(
             // Product grid
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                contentPadding = PaddingValues(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingS),
+                verticalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM),
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
             ) {
                 items(products) { product ->
                     ProductCard(product = product)
@@ -377,26 +381,26 @@ private fun FilterChip(
     isSelected: Boolean = false,
     onClick: () -> Unit
 ) {
-    Card(
-        modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFF2D2D2D) else Color(0xFFE0E0E0)
-        )
-    ) {
+        Card(
+            modifier = Modifier
+                .clip(RoundedCornerShape(AppDimensions.RadiusXL))
+                .clickable(onClick = onClick),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isSelected) AppColors.Primary else AppColors.SurfaceVariant
+            )
+        ) {
         Row(
-            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp),
+            modifier = Modifier.padding(horizontal = AppDimensions.SpacingM, vertical = AppDimensions.SpacingS),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingXS)
         ) {
             Text(
                 text = label,
-                color = if (isSelected) Color.White else Color(0xFF262626),
-                fontSize = 12.sp
+                color = if (isSelected) AppColors.TextOnPrimary else AppColors.TextPrimary,
+                style = MaterialTheme.typography.bodySmall
             )
             if (!isSelected) {
-                Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, modifier = Modifier.size(16.dp), tint = Color(0xFF262626))
+                Icon(Icons.Default.KeyboardArrowDown, contentDescription = null, modifier = Modifier.size(AppDimensions.IconXS), tint = AppColors.TextPrimary)
             }
         }
     }
@@ -409,8 +413,8 @@ private fun ProductCard(product: SearchProduct) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF)),
+            .clip(RoundedCornerShape(AppDimensions.RadiusL)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column {
@@ -432,45 +436,48 @@ private fun ProductCard(product: SearchProduct) {
                     onClick = { isFavorite = !isFavorite },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(8.dp)
+                        .padding(AppDimensions.SpacingS)
                 ) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                         contentDescription = "Favorite",
-                        tint = if (isFavorite) Color(0xFFE91E63) else Color(0xFF262626),
-                        modifier = Modifier.size(20.dp)
+                        tint = if (isFavorite) AppColors.AccentRed else AppColors.TextPrimary,
+                        modifier = Modifier.size(AppDimensions.IconS)
                     )
                 }
             }
 
             Column(
-                modifier = Modifier.padding(12.dp)
+                modifier = Modifier.padding(AppDimensions.SpacingM)
             ) {
                 Text(
                     text = product.name,
-                    fontSize = 14.sp,
-                    color = Color(0xFF262626),
-                    maxLines = 2,
-                    lineHeight = 18.sp
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextPrimary,
+                        lineHeight = 18.sp
+                    ),
+                    maxLines = 2
                 )
                 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                 
                 Text(
                     text = product.price,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
+                    )
                 )
                 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                 
                 // Stock display
                 Text(
                     text = if (product.stock > 0) "In Stock: ${product.stock}" else "No Stock",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = if (product.stock > 0) Color(0xFF28A745) else Color(0xFFDC3545)
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.Medium,
+                        color = if (product.stock > 0) AppColors.Primary else AppColors.AccentRed
+                    )
                 )
             }
         }
@@ -487,7 +494,7 @@ private fun EmptySearchResults(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
         Spacer(modifier = Modifier.height(8.dp))
         
@@ -495,14 +502,14 @@ private fun EmptySearchResults(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
 
@@ -511,14 +518,14 @@ private fun EmptySearchResults(
                 onValueChange = { },
                 modifier = Modifier
                     .weight(1f)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(Color(0xFFF4F4F4)),
-                placeholder = { Text("Search") },
+                    .clip(RoundedCornerShape(AppDimensions.RadiusXL))
+                    .background(AppColors.SurfaceVariant),
+                placeholder = { Text("Search", style = MaterialTheme.typography.bodyMedium) },
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Search,
                         contentDescription = null,
-                        tint = Color(0xFF666666)
+                        tint = AppColors.TextSecondary
                     )
                 },
                 trailingIcon = {
@@ -526,13 +533,13 @@ private fun EmptySearchResults(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Clear",
-                            tint = Color(0xFF666666)
+                            tint = AppColors.TextSecondary
                         )
                     }
                 },
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFF4F4F4),
-                    unfocusedContainerColor = Color(0xFFF4F4F4),
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
@@ -547,23 +554,24 @@ private fun EmptySearchResults(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 24.dp),
+                .padding(horizontal = AppDimensions.SpacingXXXL),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
                 contentDescription = null,
                 modifier = Modifier.size(120.dp),
-                tint = Color(0xFFFFC107)
+                tint = AppColors.Primary.copy(alpha = 0.5f)
             )
 
             Spacer(modifier = Modifier.height(24.dp))
 
             Text(
                 text = "Sorry, we couldn't find any matching result for your Search.",
-                fontSize = 16.sp,
-                color = Color(0xFF262626),
-                textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = AppColors.TextPrimary,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -571,19 +579,20 @@ private fun EmptySearchResults(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(AppDimensions.RadiusM))
                     .clickable(onClick = onExploreCategories),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+                colors = CardDefaults.cardColors(containerColor = AppColors.Primary)
             ) {
                 Text(
                     text = "Explore Categories",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(vertical = AppDimensions.SpacingL),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    color = Color.White,
-                    fontWeight = FontWeight.Medium,
-                    fontSize = 16.sp
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = AppColors.TextOnPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
             }
         }
@@ -617,9 +626,10 @@ private fun SortFilterModal(
             )
             Text(
                 text = "Sort by",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                )
             )
             IconButton(onClick = onClear) {
                 Icon(Icons.Default.Close, contentDescription = "Close", tint = Color(0xFF262626))
@@ -634,7 +644,7 @@ private fun SortFilterModal(
                 isSelected = option == selectedOption,
                 onClick = { onSelect(option) }
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
         }
     }
 }
@@ -655,9 +665,10 @@ private fun SortOptionRow(
     ) {
         Text(
             text = option,
-            fontSize = 16.sp,
-            color = if (isSelected) Color(0xFF262626) else Color(0xFF666666),
-            fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = if (isSelected) AppColors.TextPrimary else AppColors.TextSecondary,
+                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+            )
         )
         if (isSelected) {
             Text(text = "✓", color = Color(0xFF262626), fontSize = 18.sp)
@@ -690,9 +701,10 @@ private fun GenderFilterModal(
             )
             Text(
                 text = "Gender",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                )
             )
             IconButton(onClick = onClear) {
                 Icon(Icons.Default.Close, contentDescription = "Close", tint = Color(0xFF262626))
@@ -707,7 +719,7 @@ private fun GenderFilterModal(
                 isSelected = gender == selectedGender,
                 onClick = { onSelect(gender) }
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
         }
     }
 }
@@ -722,15 +734,16 @@ private fun GenderOptionRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+            .padding(vertical = AppDimensions.SpacingM),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = gender,
-            fontSize = 16.sp,
-            color = if (isSelected) Color(0xFF262626) else Color(0xFF666666),
-            fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = if (isSelected) AppColors.TextPrimary else AppColors.TextSecondary,
+                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+            )
         )
         if (isSelected) {
             Text(text = "✓", color = Color(0xFF262626), fontSize = 18.sp)
@@ -764,9 +777,10 @@ private fun DealsFilterModal(
             )
             Text(
                 text = "Deals",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                )
             )
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Default.Close, contentDescription = "Close", tint = Color(0xFF262626))
@@ -780,7 +794,7 @@ private fun DealsFilterModal(
             isSelected = onSaleSelected,
             onClick = { onOnSaleToggle(!onSaleSelected) }
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
         DealOptionRow(
             label = "Free Shipping Eligible",
             isSelected = freeShippingSelected,
@@ -799,18 +813,19 @@ private fun DealOptionRow(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+            .padding(vertical = AppDimensions.SpacingM),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = label,
-            fontSize = 16.sp,
-            color = if (isSelected) Color(0xFF262626) else Color(0xFF666666),
-            fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+            style = MaterialTheme.typography.bodyLarge.copy(
+                color = if (isSelected) AppColors.TextPrimary else AppColors.TextSecondary,
+                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+            )
         )
         if (isSelected) {
-            Text(text = "✓", color = Color(0xFF262626), fontSize = 18.sp)
+            Text(text = "✓", color = AppColors.TextPrimary, style = MaterialTheme.typography.titleLarge)
         }
     }
 }
@@ -841,9 +856,10 @@ private fun PriceFilterModal(
             )
             Text(
                 text = "Price",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                )
             )
             IconButton(onClick = onDismiss) {
                 Icon(Icons.Default.Close, contentDescription = "Close", tint = Color(0xFF262626))
@@ -854,27 +870,33 @@ private fun PriceFilterModal(
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingS)
         ) {
             OutlinedTextField(
                 value = minPrice,
                 onValueChange = onMinPriceChange,
                 modifier = Modifier.weight(1f),
-                placeholder = { Text("Min") },
+                placeholder = { Text("Min", style = MaterialTheme.typography.bodyMedium) },
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                )
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(AppDimensions.RadiusM)
             )
             OutlinedTextField(
                 value = maxPrice,
                 onValueChange = onMaxPriceChange,
                 modifier = Modifier.weight(1f),
-                placeholder = { Text("Max") },
+                placeholder = { Text("Max", style = MaterialTheme.typography.bodyMedium) },
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color.White,
-                    unfocusedContainerColor = Color.White
-                )
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                shape = RoundedCornerShape(AppDimensions.RadiusM)
             )
         }
     }

@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -43,6 +44,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import com.example.app.product.Product
 
 @Composable
@@ -59,8 +62,8 @@ fun CategoryDetailScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 16.dp)
+            .background(AppColors.Background)
+            .padding(horizontal = AppDimensions.SpacingL)
     ) {
         Spacer(modifier = Modifier.height(8.dp))
         
@@ -69,17 +72,16 @@ fun CategoryDetailScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
             
             Text(
                 text = "$category ($itemCount)",
                 style = MaterialTheme.typography.headlineSmall.copy(
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold
-                ),
-                color = Color(0xFF262626)
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                )
             )
         }
 
@@ -87,9 +89,9 @@ fun CategoryDetailScreen(
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
-            contentPadding = PaddingValues(vertical = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            contentPadding = PaddingValues(vertical = AppDimensions.SpacingL),
+            verticalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM),
+            horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
         ) {
             items(products) { product ->
                 ProductCard(
@@ -111,9 +113,9 @@ private fun ProductCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusL))
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFAFAFA)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
     ) {
         Column {
@@ -136,46 +138,49 @@ private fun ProductCard(
                     onClick = { isFavorite = !isFavorite },
                     modifier = Modifier
                         .align(Alignment.TopEnd)
-                        .padding(8.dp)
+                        .padding(AppDimensions.SpacingS)
                 ) {
                     Icon(
                         imageVector = if (isFavorite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                         contentDescription = "Favorite",
-                        tint = if (isFavorite) Color(0xFFE91E63) else Color(0xFF262626),
-                        modifier = Modifier.size(20.dp)
+                        tint = if (isFavorite) AppColors.AccentRed else AppColors.TextPrimary,
+                        modifier = Modifier.size(AppDimensions.IconS)
                     )
                 }
             }
 
             // Product name, price, and stock
             Column(
-                modifier = Modifier.padding(horizontal = 12.dp, vertical = 10.dp)
+                modifier = Modifier.padding(horizontal = AppDimensions.SpacingM, vertical = AppDimensions.SpacingM)
             ) {
                 Text(
                     text = product.name,
-                    fontSize = 14.sp,
-                    color = Color(0xFF262626),
-                    maxLines = 2,
-                    lineHeight = 18.sp
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextPrimary,
+                        lineHeight = 18.sp
+                    ),
+                    maxLines = 2
                 )
                 
-                Spacer(modifier = Modifier.height(6.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                 
                 Text(
                     text = product.price,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
+                    )
                 )
                 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                 
                 // Stock display
                 Text(
                     text = if (product.stock > 0) "In Stock: ${product.stock}" else "No Stock",
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = if (product.stock > 0) Color(0xFF28A745) else Color(0xFFDC3545)
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.Medium,
+                        color = if (product.stock > 0) AppColors.Primary else AppColors.AccentRed
+                    )
                 )
             }
         }

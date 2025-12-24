@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -35,6 +36,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 @Composable
 fun CheckoutScreen(
@@ -61,13 +64,13 @@ fun CheckoutScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
         // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingL),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -75,16 +78,15 @@ fun CheckoutScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
             Text(
                 text = "Checkout",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                ),
-                color = Color(0xFF262626)
+                    color = AppColors.TextPrimary
+                )
             )
             Spacer(modifier = Modifier.size(48.dp))
         }
@@ -94,9 +96,9 @@ fun CheckoutScreen(
                 .weight(1f)
                 .fillMaxWidth()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = AppDimensions.SpacingL)
         ) {
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
 
             // Shipping Address Section
             ShippingAddressSection(
@@ -122,14 +124,14 @@ fun CheckoutScreen(
             
             // Payment verification status for token payments
             if (selectedPaymentType == "token") {
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
                         containerColor = if (isPaymentVerified) 
-                            Color(0xFFE8F5E9) 
+                            AppColors.PrimaryLight.copy(alpha = 0.1f) 
                         else 
-                            Color(0xFFFFF3E0)
+                            AppColors.AccentRed.copy(alpha = 0.1f)
                     )
                 ) {
                     Row(
@@ -141,16 +143,18 @@ fun CheckoutScreen(
                     ) {
                         Text(
                             text = if (isPaymentVerified) "✓" else "⚠",
-                            fontSize = 20.sp,
-                            color = if (isPaymentVerified) Color(0xFF4CAF50) else Color(0xFFFF9800)
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                color = if (isPaymentVerified) AppColors.Primary else AppColors.AccentRed
+                            )
                         )
                         Text(
                             text = if (isPaymentVerified) 
                                 "Token payment verified. You can place your order." 
                             else 
                                 "Please complete token payment in MetaMask first.",
-                            fontSize = 12.sp,
-                            color = if (isPaymentVerified) Color(0xFF2E7D32) else Color(0xFFE65100),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                color = if (isPaymentVerified) AppColors.Primary else AppColors.AccentRed
+                            ),
                             modifier = Modifier.weight(1f)
                         )
                         
@@ -158,7 +162,7 @@ fun CheckoutScreen(
                             TextButton(
                                 onClick = onVerifyClick,
                                 colors = ButtonDefaults.textButtonColors(
-                                    contentColor = Color(0xFFE65100)
+                                    contentColor = AppColors.AccentRed
                                 )
                             ) {
                                 Text("Check Status", fontWeight = FontWeight.Bold)
@@ -175,7 +179,7 @@ fun CheckoutScreen(
                 onClick = onBankClick
             )
 
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
             // Order Summary
             OrderSummarySection(
@@ -225,21 +229,23 @@ private fun ShippingAddressSection(
                 Icon(
                     imageVector = Icons.Default.LocationOn,
                     contentDescription = "Location",
-                    tint = Color(0xFF262626),
-                    modifier = Modifier.size(24.dp)
+                    tint = AppColors.TextPrimary,
+                    modifier = Modifier.size(AppDimensions.IconMedium)
                 )
                 Column {
                     Text(
                         text = "Shipping Address",
-                        fontSize = 12.sp,
-                        color = Color(0xFF999999)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.TextTertiary
+                        )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = address,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF262626)
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = AppColors.TextPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
                 }
             }
@@ -291,25 +297,27 @@ private fun PaymentMethodSection(
                 Column {
                     Text(
                         text = "Payment Method",
-                        fontSize = 12.sp,
-                        color = Color(0xFF999999)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.TextTertiary
+                        )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingS)
                     ) {
                         Text(
                             text = cardNumber,
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF262626)
+                            style = MaterialTheme.typography.bodyLarge.copy(
+                                color = AppColors.TextPrimary,
+                                fontWeight = FontWeight.Bold
+                            )
                         )
                         // Mastercard icon placeholder
                         Box(
                             modifier = Modifier
                                 .size(24.dp)
-                                .clip(RoundedCornerShape(4.dp))
+                                .clip(RoundedCornerShape(AppDimensions.RadiusXS))
                                 .background(Color(0xFFEB001B))
                         )
                     }
@@ -332,10 +340,10 @@ private fun TokenPaymentSection(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusM))
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFFE3F2FD) else Color(0xFFF0F0F0)
+            containerColor = if (isSelected) AppColors.PrimaryLight.copy(alpha = 0.1f) else AppColors.Surface
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = if (isSelected) 2.dp else 1.dp)
     ) {
@@ -352,8 +360,8 @@ private fun TokenPaymentSection(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(24.dp)
-                        .clip(RoundedCornerShape(4.dp))
+                        .size(AppDimensions.IconMedium)
+                        .clip(RoundedCornerShape(AppDimensions.RadiusXS))
                         .background(Color(0xFFF7931E)),
                     contentAlignment = Alignment.Center
                 ) {
@@ -365,22 +373,24 @@ private fun TokenPaymentSection(
                 Column {
                     Text(
                         text = "Token Payment",
-                        fontSize = 12.sp,
-                        color = Color(0xFF999999)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.TextTertiary
+                        )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Pay with ${com.example.app.blockchain.config.TokenConfig.TOKEN_SYMBOL}",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF262626)
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = AppColors.TextPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
                 }
             }
             Icon(
                 imageVector = Icons.Default.KeyboardArrowRight,
                 contentDescription = "Select Token Payment",
-                tint = Color(0xFF262626)
+                tint = AppColors.TextPrimary
             )
         }
     }
@@ -424,22 +434,24 @@ private fun BankSection(
                 Column {
                     Text(
                         text = "Bank",
-                        fontSize = 12.sp,
-                        color = Color(0xFF999999)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.TextTertiary
+                        )
                     )
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = "Get QRCode",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF262626)
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            color = AppColors.TextPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
                 }
             }
             Icon(
                 imageVector = Icons.Default.KeyboardArrowRight,
                 contentDescription = "Get QRCode",
-                tint = Color(0xFF262626)
+                tint = AppColors.TextPrimary
             )
         }
     }
@@ -459,13 +471,16 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Subtotal",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextSecondary
+                )
             )
             Text(
                 text = "$${String.format("%.2f", subtotal)}",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Medium
+                )
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -475,13 +490,16 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Shipping Cost",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextSecondary
+                )
             )
             Text(
                 text = "$${String.format("%.2f", shippingCost)}",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Medium
+                )
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -491,13 +509,16 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Tax",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextSecondary
+                )
             )
             Text(
                 text = "$${String.format("%.2f", tax)}",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Medium
+                )
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -507,15 +528,17 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Total",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
             Text(
                 text = "$${String.format("%.2f", total)}",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = AppColors.TextPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }
@@ -531,22 +554,23 @@ private fun BottomActionBar(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp)),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D)),
+            .clip(RoundedCornerShape(topStart = AppDimensions.RadiusL, topEnd = AppDimensions.RadiusL)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Primary),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                .padding(AppDimensions.SpacingL),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = "$${String.format("%.2f", total)}",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.White
+                style = MaterialTheme.typography.titleLarge.copy(
+                    color = AppColors.TextOnPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
             val isButtonEnabled = selectedPaymentType != null && (selectedPaymentType != "token" || isPaymentVerified)
             
@@ -561,7 +585,7 @@ private fun BottomActionBar(
                         }
                     ),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (isButtonEnabled) Color(0xFF4CAF50) else Color(0xFF9E9E9E)
+                    containerColor = if (isButtonEnabled) AppColors.PrimaryLight else AppColors.SurfaceVariant
                 )
             ) {
                 Text(
@@ -569,10 +593,11 @@ private fun BottomActionBar(
                         "Complete Payment First" 
                     else 
                         "Place Order",
-                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 12.dp),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    modifier = Modifier.padding(horizontal = AppDimensions.SpacingXXXL, vertical = AppDimensions.SpacingL),
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = if (isButtonEnabled) AppColors.Primary else AppColors.TextTertiary,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
             }
         }

@@ -36,6 +36,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
@@ -59,19 +61,19 @@ fun AddCardScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2D2D2D))
+            .background(AppColors.Primary)
     ) {
         // White content card
         Card(
             modifier = Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp)),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5))
+                .clip(RoundedCornerShape(topStart = AppDimensions.RadiusXXL, topEnd = AppDimensions.RadiusXXL)),
+            colors = CardDefaults.cardColors(containerColor = AppColors.Background)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(AppDimensions.SpacingL)
             ) {
                 // Header
                 Row(
@@ -83,21 +85,20 @@ fun AddCardScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color(0xFF262626)
+                            tint = AppColors.TextPrimary
                         )
                     }
                     Text(
                         text = "Add Card",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
-                        ),
-                        color = Color(0xFF262626)
+                            color = AppColors.TextPrimary
+                        )
                     )
                     Spacer(modifier = Modifier.size(48.dp))
                 }
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
                 // Card Number
                 OutlinedTextField(
@@ -106,12 +107,12 @@ fun AddCardScreen(
                     label = { Text("Card Number") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFF0F0F0),
-                        unfocusedContainerColor = Color(0xFFF0F0F0),
+                        focusedContainerColor = AppColors.SurfaceVariant,
+                        unfocusedContainerColor = AppColors.SurfaceVariant,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(AppDimensions.RadiusM)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -119,7 +120,7 @@ fun AddCardScreen(
                 // CCV and Exp
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
                 ) {
                     OutlinedTextField(
                         value = cvv,
@@ -127,12 +128,12 @@ fun AddCardScreen(
                         label = { Text("CVV") },
                         modifier = Modifier.weight(1f),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color(0xFFF0F0F0),
-                            unfocusedContainerColor = Color(0xFFF0F0F0),
+                            focusedContainerColor = AppColors.SurfaceVariant,
+                            unfocusedContainerColor = AppColors.SurfaceVariant,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(AppDimensions.RadiusM)
                     )
                     OutlinedTextField(
                         value = exp,
@@ -140,12 +141,12 @@ fun AddCardScreen(
                         label = { Text("Exp") },
                         modifier = Modifier.weight(1f),
                         colors = TextFieldDefaults.colors(
-                            focusedContainerColor = Color(0xFFF0F0F0),
-                            unfocusedContainerColor = Color(0xFFF0F0F0),
+                            focusedContainerColor = AppColors.SurfaceVariant,
+                            unfocusedContainerColor = AppColors.SurfaceVariant,
                             focusedIndicatorColor = Color.Transparent,
                             unfocusedIndicatorColor = Color.Transparent
                         ),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(AppDimensions.RadiusM)
                     )
                 }
 
@@ -158,12 +159,12 @@ fun AddCardScreen(
                     label = { Text("Cardholder Name") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFF0F0F0),
-                        unfocusedContainerColor = Color(0xFFF0F0F0),
+                        focusedContainerColor = AppColors.SurfaceVariant,
+                        unfocusedContainerColor = AppColors.SurfaceVariant,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(AppDimensions.RadiusM)
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -179,8 +180,9 @@ fun AddCardScreen(
                     )
                     Text(
                         text = "Set as default payment method",
-                        fontSize = 14.sp,
-                        color = Color(0xFF262626)
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = AppColors.TextPrimary
+                        )
                     )
                 }
 
@@ -190,7 +192,7 @@ fun AddCardScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clip(RoundedCornerShape(12.dp))
+                        .clip(RoundedCornerShape(AppDimensions.RadiusM))
                         .clickable(enabled = !isLoading && cardNumber.isNotBlank() && cvv.isNotBlank() && exp.isNotBlank() && cardholderName.isNotBlank()) {
                             isLoading = true
                             scope.launch {
@@ -208,22 +210,23 @@ fun AddCardScreen(
                         },
                     colors = CardDefaults.cardColors(
                         containerColor = if (isLoading || cardNumber.isBlank() || cvv.isBlank() || exp.isBlank() || cardholderName.isBlank()) 
-                            Color(0xFF999999) else Color(0xFF2D2D2D)
+                            AppColors.TextTertiary else AppColors.Primary
                     )
                 ) {
                     Text(
                         text = if (isLoading) "Saving..." else "Save",
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 16.dp),
+                            .padding(vertical = AppDimensions.SpacingL),
                         textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.TextOnPrimary
+                        )
                     )
                 }
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
             }
         }
     }

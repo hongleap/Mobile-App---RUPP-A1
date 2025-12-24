@@ -32,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import com.example.app.orders.data.Order
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -94,30 +96,30 @@ fun TrackOrderScreen(
 
     Column(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
-            .padding(top = 16.dp)
-            .padding(bottom = 40.dp)
+            .fillMaxSize()
+            .background(AppColors.Background)
+            .padding(horizontal = AppDimensions.SpacingL)
+            .padding(top = AppDimensions.SpacingL)
+            .padding(bottom = AppDimensions.SpacingXXL)
     ) {
         // Back button and order number
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = 24.dp)
+            modifier = Modifier.padding(bottom = AppDimensions.SpacingXXXL)
         ) {
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
             Text(
                 text = "Order #$orderNumber",
-                style = MaterialTheme.typography.headlineSmall.copy(
+                style = MaterialTheme.typography.titleLarge.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 20.sp
-                ),
-                color = Color(0xFF262626)
+                    color = AppColors.TextPrimary
+                )
             )
         }
 
@@ -131,7 +133,7 @@ fun TrackOrderScreen(
             items = order?.items ?: emptyList()
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         // Shipping details
         ShippingDetailsSection(
@@ -159,16 +161,16 @@ private fun OrderStatusTimeline(statuses: List<OrderStatus>) {
                             .size(16.dp)
                             .clip(CircleShape)
                             .background(
-                                if (status.isCompleted) Color(0xFF2D2D2D) 
-                                else if (status.isCurrent) Color(0xFFE0E0E0)
-                                else Color(0xFF2D2D2D)
+                                if (status.isCompleted) AppColors.Primary 
+                                else if (status.isCurrent) AppColors.SurfaceVariant
+                                else AppColors.Primary
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         if (status.isCompleted && !status.isCurrent) {
                             Text(
                                 text = "✓",
-                                color = Color.White,
+                                color = AppColors.TextOnPrimary,
                                 fontSize = 10.sp
                             )
                         }
@@ -182,7 +184,7 @@ private fun OrderStatusTimeline(statuses: List<OrderStatus>) {
                                 .width(2.dp)
                                 .height(50.dp)
                                 .background(
-                                    if (status.isCompleted) Color(0xFF2D2D2D) else Color(0xFFE0E0E0)
+                                    if (status.isCompleted) AppColors.Primary else AppColors.SurfaceVariant
                                 )
                         )
                     }
@@ -194,17 +196,19 @@ private fun OrderStatusTimeline(statuses: List<OrderStatus>) {
                 Column(modifier = Modifier.weight(1f)) {
                     Text(
                         text = status.status,
-                        fontSize = 14.sp,
-                        fontWeight = if (status.isCompleted || status.isCurrent) FontWeight.Medium else FontWeight.Normal,
-                        color = if (status.isCompleted || status.isCurrent) Color(0xFF262626) else Color(0xFF999999)
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            fontWeight = if (status.isCompleted || status.isCurrent) FontWeight.Medium else FontWeight.Normal,
+                            color = if (status.isCompleted || status.isCurrent) AppColors.TextPrimary else AppColors.TextTertiary
+                        )
                     )
                     Text(
                         text = status.date,
-                        fontSize = 12.sp,
-                        color = Color(0xFF999999)
+                        style = MaterialTheme.typography.bodySmall.copy(
+                            color = AppColors.TextTertiary
+                        )
                     )
                     if (index < statuses.size - 1) {
-                        Spacer(modifier = Modifier.height(32.dp))
+                        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
                     }
                 }
             }
@@ -219,10 +223,11 @@ private fun OrderItemsSection(
     Column {
         Text(
             text = "Order Items",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF262626),
-            modifier = Modifier.padding(bottom = 12.dp)
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = AppColors.TextPrimary
+            ),
+            modifier = Modifier.padding(bottom = AppDimensions.SpacingM)
         )
 
         Card(
@@ -239,8 +244,9 @@ private fun OrderItemsSection(
                 if (items.isEmpty()) {
                     Text(
                         text = "No items in this order",
-                        fontSize = 14.sp,
-                        color = Color(0xFF999999)
+                        style = MaterialTheme.typography.bodyMedium.copy(
+                            color = AppColors.TextTertiary
+                        )
                     )
                 } else {
                     items.forEachIndexed { index, item ->
@@ -251,8 +257,8 @@ private fun OrderItemsSection(
                             // Product image
                             Box(
                                 modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(RoundedCornerShape(8.dp))
+                                    .size(AppDimensions.IconXXL)
+                                    .clip(RoundedCornerShape(AppDimensions.RadiusM))
                             ) {
                                 com.example.app.ui.ProductImage(
                                     productId = item.productId,
@@ -262,40 +268,43 @@ private fun OrderItemsSection(
                                 )
                             }
 
-                            Spacer(modifier = Modifier.width(12.dp))
+                            Spacer(modifier = Modifier.width(AppDimensions.SpacingM))
 
                             // Product details
                             Column(modifier = Modifier.weight(1f)) {
                                 Text(
                                     text = item.productName,
-                                    fontSize = 14.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color(0xFF262626)
+                                    style = MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Medium,
+                                        color = AppColors.TextPrimary
+                                    )
                                 )
                                 Text(
                                     text = "Qty: ${item.quantity}",
-                                    fontSize = 12.sp,
-                                    color = Color(0xFF999999)
+                                    style = MaterialTheme.typography.bodySmall.copy(
+                                        color = AppColors.TextSecondary
+                                    )
                                 )
                             }
 
                             // Price
                             Text(
                                 text = "$${String.format("%.2f", item.price * item.quantity)}",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF262626)
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Medium,
+                                    color = AppColors.TextPrimary
+                                )
                             )
                         }
 
                         // Add divider between items (except for last item)
                         if (index < items.size - 1) {
-                            Spacer(modifier = Modifier.height(12.dp))
+                            Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
                             Box(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(1.dp)
-                                    .background(Color(0xFFF0F0F0))
+                                    .background(AppColors.SurfaceVariant)
                             )
                             Spacer(modifier = Modifier.height(12.dp))
                         }
@@ -314,10 +323,11 @@ private fun ShippingDetailsSection(
     Column {
         Text(
             text = "Shipping details",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF262626),
-            modifier = Modifier.padding(bottom = 12.dp)
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold,
+                color = AppColors.TextPrimary
+            ),
+            modifier = Modifier.padding(bottom = AppDimensions.SpacingM)
         )
 
         Card(
@@ -333,15 +343,17 @@ private fun ShippingDetailsSection(
             ) {
                 Text(
                     text = address,
-                    fontSize = 14.sp,
-                    color = Color(0xFF262626),
-                    lineHeight = 20.sp
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextPrimary,
+                        lineHeight = 20.sp
+                    )
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = phoneNumber,
-                    fontSize = 14.sp,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextPrimary
+                    )
                 )
             }
         }

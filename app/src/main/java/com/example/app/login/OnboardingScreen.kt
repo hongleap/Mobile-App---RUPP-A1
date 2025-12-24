@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.DropdownMenuItem
@@ -39,6 +40,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -50,52 +53,53 @@ fun OnboardingScreen(
     var ageRange by remember { mutableStateOf("Age Range") }
     var isAgeDropdownExpanded by remember { mutableStateOf(false) }
 
-    val chipBackgroundSelected = Color(0xFF2D2D2D)
-    val chipBackgroundUnselected = Color(0xFFF5F5F5)
+    val chipBackgroundSelected = AppColors.Primary
+    val chipBackgroundUnselected = AppColors.SurfaceVariant
 
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 24.dp, vertical = 16.dp)
+            .background(AppColors.Background)
+            .padding(horizontal = AppDimensions.SpacingXXXL, vertical = AppDimensions.SpacingL)
     ) {
         IconButton(
             onClick = onBackClick,
             modifier = Modifier
-                .size(40.dp)
-                .clip(RoundedCornerShape(50))
-                .background(Color(0xFFF2F2F2))
+                .size(AppDimensions.ButtonHeightSmall)
+                .clip(CircleShape)
+                .background(AppColors.SurfaceVariant)
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Back",
-                tint = Color(0xFF262626)
+                tint = AppColors.TextPrimary
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         Text(
             text = "Tell us About yourself",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF262626)
+            style = MaterialTheme.typography.headlineLarge.copy(
+                color = AppColors.TextPrimary,
+                fontWeight = FontWeight.Bold
+            )
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         Text(
             text = "Who do you shop for ?",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF262626)
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = AppColors.TextPrimary
+            )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+            horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingL)
         ) {
             OnboardingToggleChip(
                 label = "Men",
@@ -116,16 +120,16 @@ fun OnboardingScreen(
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         Text(
             text = "How Old are you ?",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF262626)
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = AppColors.TextPrimary
+            )
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
 
         ExposedDropdownMenuBox(
             expanded = isAgeDropdownExpanded,
@@ -137,16 +141,18 @@ fun OnboardingScreen(
                 modifier = Modifier
                     .menuAnchor()
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color(0xFFF5F5F5)),
+                    .height(AppDimensions.ButtonHeightMedium),
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isAgeDropdownExpanded) },
                 readOnly = true,
                 colors = ExposedDropdownMenuDefaults.textFieldColors(
-                    focusedContainerColor = Color(0xFFF5F5F5),
-                    unfocusedContainerColor = Color(0xFFF5F5F5),
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
                     focusedIndicatorColor = Color.Transparent,
-                    unfocusedIndicatorColor = Color.Transparent
+                    unfocusedIndicatorColor = Color.Transparent,
+                    focusedTextColor = AppColors.TextPrimary,
+                    unfocusedTextColor = AppColors.TextPrimary
                 ),
+                shape = RoundedCornerShape(AppDimensions.RadiusM),
                 singleLine = true
             )
 
@@ -172,7 +178,7 @@ fun OnboardingScreen(
         ContinueButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(AppDimensions.ButtonHeightMedium),
             label = "Finish",
             onClick = { onFinishClick(selectedShopFor, ageRange) }
         )
@@ -189,22 +195,22 @@ private fun OnboardingToggleChip(
     onSelect: () -> Unit
 ) {
     val background = if (isSelected) selectedBackground else unselectedBackground
-    val textColor = if (isSelected) Color.White else Color(0xFF262626)
+    val textColor = if (isSelected) AppColors.TextOnPrimary else AppColors.TextPrimary
 
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(24.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusM))
             .background(background)
             .clickable(onClick = onSelect)
-            .padding(horizontal = 24.dp, vertical = 14.dp),
+            .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingM),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = label,
-            color = textColor,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium,
-            textAlign = TextAlign.Center
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = textColor,
+                textAlign = TextAlign.Center
+            )
         )
     }
 }

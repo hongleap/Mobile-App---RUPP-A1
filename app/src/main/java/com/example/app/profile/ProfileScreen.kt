@@ -38,6 +38,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 @Composable
 fun ProfileScreen(
@@ -57,24 +59,22 @@ fun ProfileScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2D2D2D))
+            .background(AppColors.Background)
     ) {
         // Main content card
         Card(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 0.dp)
-                .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp)),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+                .fillMaxSize(),
+            colors = CardDefaults.cardColors(containerColor = AppColors.Background),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = AppDimensions.SpacingL)
             ) {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
                 // Profile Header
                 ProfileHeader(
@@ -84,7 +84,7 @@ fun ProfileScreen(
                     onEditClick = onEditProfileClick
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
                 // Menu Items
                 ProfileMenuItem(
@@ -93,7 +93,7 @@ fun ProfileScreen(
                     onClick = onAddressClick
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
 
                 ProfileMenuItem(
                     icon = Icons.Default.Favorite,
@@ -101,7 +101,7 @@ fun ProfileScreen(
                     onClick = onWishlistClick
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
 
                 ProfileMenuItem(
                     icon = Icons.Default.Settings,
@@ -109,7 +109,7 @@ fun ProfileScreen(
                     onClick = onPaymentMethodClick
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
 
                 ProfileMenuItem(
                     icon = Icons.Default.Settings,
@@ -117,7 +117,7 @@ fun ProfileScreen(
                     onClick = onWalletClick
                 )
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
 
                 ProfileMenuItem(
                     icon = Icons.Default.Settings,
@@ -125,7 +125,7 @@ fun ProfileScreen(
                     onClick = onSupportClick
                 )
 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
                 // Sign Out Button
                 Text(
@@ -134,9 +134,10 @@ fun ProfileScreen(
                         .fillMaxWidth()
                         .clickable(onClick = onSignOutClick),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFFFF0000)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = AppColors.AccentRed,
+                        fontWeight = FontWeight.Bold
+                    )
                 )
 
                 // Add bottom padding to account for bottom navigation bar
@@ -162,28 +163,29 @@ private fun ProfileHeader(
             modifier = Modifier
                 .size(100.dp)
                 .clip(CircleShape)
-                .background(Color(0xFFE8E8E8)),
+                .background(AppColors.SurfaceVariant),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = Icons.Default.Person,
                 contentDescription = "Profile",
-                tint = Color(0xFF999999),
+                tint = AppColors.TextTertiary,
                 modifier = Modifier.size(50.dp)
             )
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
 
         // Name
         Text(
             text = userName,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF262626)
+            style = MaterialTheme.typography.headlineSmall.copy(
+                color = AppColors.TextPrimary,
+                fontWeight = FontWeight.Bold
+            )
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
 
         // Email and Phone with Edit button
         Row(
@@ -196,22 +198,25 @@ private fun ProfileHeader(
             ) {
                 Text(
                     text = userEmail,
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextSecondary
+                    )
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                 Text(
                     text = userPhone,
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextSecondary
+                    )
                 )
             }
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(AppDimensions.SpacingL))
             Text(
                 text = "Edit",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color(0xFF262626),
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.Primary,
+                    fontWeight = FontWeight.Bold
+                ),
                 modifier = Modifier.clickable(onClick = onEditClick)
             )
         }
@@ -227,39 +232,40 @@ private fun ProfileMenuItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusM))
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F0F0)),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
-                    tint = Color(0xFF262626),
-                    modifier = Modifier.size(24.dp)
+                    tint = AppColors.Primary,
+                    modifier = Modifier.size(AppDimensions.IconMedium)
                 )
                 Text(
                     text = title,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
             }
             Icon(
                 imageVector = Icons.Default.KeyboardArrowRight,
                 contentDescription = "Navigate",
-                tint = Color(0xFF262626)
+                tint = AppColors.TextTertiary
             )
         }
     }

@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
@@ -39,6 +40,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 data class RedemptionProduct(
     val id: String,
@@ -63,26 +66,26 @@ fun RedemptionScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFF2D2D2D))
+            .background(AppColors.Primary)
     ) {
         // Main content card
         Card(
             modifier = Modifier
                 .fillMaxSize()
-                .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp)),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFFF5F5F5)),
+                .clip(RoundedCornerShape(topStart = AppDimensions.RadiusXXL, topEnd = AppDimensions.RadiusXXL)),
+            colors = CardDefaults.cardColors(containerColor = AppColors.Background),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = AppDimensions.SpacingL)
             ) {
                 // Header
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 0.dp, vertical = 20.dp),
+                        .padding(vertical = AppDimensions.SpacingXXXL),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -90,16 +93,15 @@ fun RedemptionScreen(
                         Icon(
                             imageVector = Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color(0xFF262626)
+                            tint = AppColors.TextPrimary
                         )
                     }
                     Text(
                         text = "Redemption",
                         style = MaterialTheme.typography.headlineSmall.copy(
                             fontWeight = FontWeight.Bold,
-                            fontSize = 24.sp
-                        ),
-                        color = Color(0xFF262626)
+                            color = AppColors.TextPrimary
+                        )
                     )
                     Spacer(modifier = Modifier.size(48.dp))
                 }
@@ -108,32 +110,34 @@ fun RedemptionScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(vertical = AppDimensions.SpacingL),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
                         text = "Balance :",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF262626)
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Medium,
+                            color = AppColors.TextPrimary
+                        )
                     )
                     Text(
                         text = "$balance CToken",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF262626)
+                        style = MaterialTheme.typography.bodyLarge.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.TextPrimary
+                        )
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
 
                 // Products Grid
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(2),
-                    contentPadding = PaddingValues(vertical = 8.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    contentPadding = PaddingValues(vertical = AppDimensions.SpacingS),
+                    verticalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM),
+                    horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     items(products.size) { index ->
@@ -161,9 +165,9 @@ private fun RedemptionProductCard(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusL))
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Box {
@@ -172,8 +176,8 @@ private fun RedemptionProductCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(200.dp)
-                    .clip(RoundedCornerShape(12.dp, 12.dp, 0.dp, 0.dp))
-                    .background(Color(0xFFE8E8E8))
+                    .clip(RoundedCornerShape(topStart = AppDimensions.RadiusL, topEnd = AppDimensions.RadiusL))
+                    .background(AppColors.SurfaceVariant)
             )
 
             // Favorite icon
@@ -181,13 +185,13 @@ private fun RedemptionProductCard(
                 onClick = { isFavorite = !isFavorite },
                 modifier = Modifier
                     .align(Alignment.TopEnd)
-                    .padding(8.dp)
+                    .padding(AppDimensions.SpacingS)
             ) {
                 Icon(
                     imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
                     contentDescription = "Favorite",
-                    tint = if (isFavorite) Color(0xFFFF0000) else Color(0xFF262626),
-                    modifier = Modifier.size(20.dp)
+                    tint = if (isFavorite) AppColors.AccentRed else AppColors.TextPrimary,
+                    modifier = Modifier.size(AppDimensions.IconS)
                 )
             }
 
@@ -195,21 +199,23 @@ private fun RedemptionProductCard(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(12.dp)
+                    .padding(AppDimensions.SpacingM)
                     .align(Alignment.BottomStart)
             ) {
                 Text(
                     text = product.name,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        fontWeight = FontWeight.Medium,
+                        color = AppColors.TextPrimary
+                    )
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                 Text(
                     text = "${product.priceInCToken} CToken",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextPrimary
+                    )
                 )
             }
         }

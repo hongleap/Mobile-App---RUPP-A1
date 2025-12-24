@@ -16,12 +16,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -43,6 +45,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import com.example.app.orders.data.Order
 
 val orderStatuses = listOf("Processing", "Shipped", "Delivered", "Returned", "Canceled")
@@ -68,19 +72,18 @@ fun OrdersScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
         // Header
         Text(
             text = "Orders",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingL),
             style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.Bold,
-                fontSize = 24.sp
-            ),
-            color = Color(0xFF262626)
+                color = AppColors.TextPrimary
+            )
         )
 
         if (orders.isEmpty()) {
@@ -93,7 +96,7 @@ fun OrdersScreen(
                 onStatusSelected = { selectedStatus = it }
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
 
             // Orders list
             OrdersList(
@@ -111,7 +114,7 @@ fun OrdersScreen(
                 onNotificationsClick = onNotificationsClick,
                 onProfileClick = onProfileClick
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
         }
     }
 }
@@ -124,9 +127,9 @@ private fun StatusFilters(
     LazyRow(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(vertical = AppDimensions.SpacingS),
+        contentPadding = PaddingValues(horizontal = AppDimensions.SpacingL),
+        horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingS)
     ) {
         items(orderStatuses) { status ->
             StatusChip(
@@ -146,18 +149,19 @@ private fun StatusChip(
 ) {
     Card(
         modifier = Modifier
-            .clip(RoundedCornerShape(20.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusL))
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
-            containerColor = if (isSelected) Color(0xFF2D2D2D) else Color(0xFFE0E0E0)
+            containerColor = if (isSelected) AppColors.Primary else AppColors.SurfaceVariant
         )
     ) {
         Text(
             text = status,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 10.dp),
-            color = if (isSelected) Color.White else Color(0xFF262626),
-            fontSize = 14.sp,
-            fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+            modifier = Modifier.padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingS),
+            color = if (isSelected) AppColors.TextOnPrimary else AppColors.TextPrimary,
+            style = MaterialTheme.typography.bodyMedium.copy(
+                fontWeight = if (isSelected) FontWeight.Medium else FontWeight.Normal
+            )
         )
     }
 }
@@ -170,8 +174,8 @@ private fun OrdersList(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(horizontal = AppDimensions.SpacingL),
+        verticalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
     ) {
         orders.forEach { order ->
             OrderCard(order = order, onClick = { onOrderClick(order.id) })
@@ -184,21 +188,21 @@ private fun OrderCard(order: Order, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(12.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusM))
             .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(containerColor = Color(0xFFFFFFFF))
+        colors = CardDefaults.cardColors(containerColor = AppColors.Surface)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Product image (show first item's image)
             Box(
                 modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .size(AppDimensions.IconXXL)
+                    .clip(RoundedCornerShape(AppDimensions.RadiusS))
             ) {
                 val firstItem = order.items.firstOrNull()
                 if (firstItem != null) {
@@ -213,42 +217,44 @@ private fun OrderCard(order: Order, onClick: () -> Unit) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
-                            .background(Color(0xFFF0F0F0)),
+                            .background(AppColors.SurfaceVariant),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             imageVector = Icons.Filled.ShoppingCart,
                             contentDescription = null,
-                            modifier = Modifier.size(24.dp),
-                            tint = Color(0xFF666666)
+                            modifier = Modifier.size(AppDimensions.IconMedium),
+                            tint = AppColors.TextTertiary
                         )
                     }
                 }
             }
 
-            Spacer(modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(AppDimensions.SpacingL))
 
             // Order details
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = "Order #${order.orderNumber}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = AppColors.TextPrimary,
+                        fontWeight = FontWeight.Medium
+                    )
                 )
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXS))
                 Text(
                     text = "${order.itemCount} items",
-                    fontSize = 14.sp,
-                    color = Color(0xFF666666)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextSecondary
+                    )
                 )
             }
 
             // Chevron icon
-            Text(
-                text = ">",
-                fontSize = 20.sp,
-                color = Color(0xFF666666)
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "Navigate",
+                tint = AppColors.TextTertiary
             )
         }
     }
@@ -259,7 +265,7 @@ private fun EmptyOrdersState(onExploreCategories: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 24.dp),
+            .padding(horizontal = AppDimensions.SpacingXXXL),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
@@ -272,38 +278,40 @@ private fun EmptyOrdersState(onExploreCategories: () -> Unit) {
                 imageVector = Icons.Filled.ShoppingCart,
                 contentDescription = null,
                 modifier = Modifier.size(100.dp),
-                tint = Color(0xFFFF9800)
+                tint = AppColors.Primary
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         Text(
             text = "No Orders yet",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF262626)
+            style = MaterialTheme.typography.titleLarge.copy(
+                color = AppColors.TextPrimary,
+                fontWeight = FontWeight.Bold
+            )
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         // Explore Categories button
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp))
+                .clip(RoundedCornerShape(AppDimensions.RadiusM))
                 .clickable(onClick = onExploreCategories),
-            colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+            colors = CardDefaults.cardColors(containerColor = AppColors.Primary)
         ) {
             Text(
                 text = "Explore Categories",
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                    .padding(vertical = AppDimensions.SpacingL),
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                color = Color.White,
-                fontWeight = FontWeight.Medium,
-                fontSize = 16.sp
+                style = MaterialTheme.typography.titleMedium.copy(
+                    color = AppColors.TextOnPrimary,
+                    fontWeight = FontWeight.Bold
+                )
             )
         }
     }
@@ -320,16 +328,16 @@ private fun BottomNavBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(24.dp, 24.dp, 0.dp, 0.dp))
-            .background(Color(0xFFF6F6F6))
-            .padding(horizontal = 24.dp, vertical = 12.dp),
+            .clip(RoundedCornerShape(AppDimensions.RadiusL, AppDimensions.RadiusL, 0.dp, 0.dp))
+            .background(AppColors.Surface)
+            .padding(horizontal = AppDimensions.SpacingXXXL, vertical = AppDimensions.SpacingM),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val homeColor = if (selectedTab == "home") Color(0xFF6B5BFF) else Color(0xFF262626)
-        val ordersColor = if (selectedTab == "orders") Color(0xFF6B5BFF) else Color(0xFF262626)
-        val notificationsColor = if (selectedTab == "notifications") Color(0xFF6B5BFF) else Color(0xFF262626)
-        val profileColor = if (selectedTab == "profile") Color(0xFF6B5BFF) else Color(0xFF262626)
+        val homeColor = if (selectedTab == "home") AppColors.Primary else AppColors.TextPrimary
+        val ordersColor = if (selectedTab == "orders") AppColors.Primary else AppColors.TextPrimary
+        val notificationsColor = if (selectedTab == "notifications") AppColors.Primary else AppColors.TextPrimary
+        val profileColor = if (selectedTab == "profile") AppColors.Primary else AppColors.TextPrimary
 
         Box {
             Icon(

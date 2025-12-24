@@ -19,32 +19,32 @@ import androidx.compose.ui.unit.sp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.constraintlayout.compose.Dimension
 
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
+import androidx.compose.material3.MaterialTheme
+
 @Composable
 fun ContinueButton(
     modifier: Modifier = Modifier,
     label: String = "Continue",
-    minWidth: Dp = 342.dp,
-    minHeight: Dp = 47.dp,
     enabled: Boolean = true,
     onClick: () -> Unit = {}
 ) {
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(32.0.dp))
+            .clip(RoundedCornerShape(AppDimensions.RadiusM))
             .background(
-                if (enabled) Color(red = 0.25f, green = 0.25f, blue = 0.25f, alpha = 1.0f)
-                else Color(red = 0.7f, green = 0.7f, blue = 0.7f, alpha = 1.0f)
+                if (enabled) AppColors.Primary
+                else AppColors.TextTertiary
             )
-            .clickable(enabled = enabled, onClick = onClick)
-            .defaultMinSize(minWidth = minWidth, minHeight = minHeight),
+            .clickable(enabled = enabled, onClick = onClick),
         contentAlignment = Alignment.Center
     ) {
         Text(
             text = label,
-            style = LocalTextStyle.current.copy(
-                color = Color.White,
-                textAlign = TextAlign.Center,
-                fontSize = 16.0.sp
+            style = MaterialTheme.typography.titleMedium.copy(
+                color = AppColors.TextOnPrimary,
+                textAlign = TextAlign.Center
             )
         )
     }

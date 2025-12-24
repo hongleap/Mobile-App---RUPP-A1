@@ -26,6 +26,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material.icons.filled.Email
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 @Composable
 fun PasswordResetConfirmationScreen(
@@ -35,22 +37,22 @@ fun PasswordResetConfirmationScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+            .background(AppColors.Background)
+            .padding(horizontal = AppDimensions.SpacingXXXL, vertical = AppDimensions.SpacingL),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         IconButton(
             onClick = onBackClick,
             modifier = Modifier
                 .align(Alignment.Start)
-                .size(40.dp)
+                .size(AppDimensions.ButtonHeightSmall)
                 .clip(CircleShape)
-                .background(Color(0xFFF2F2F2))
+                .background(AppColors.SurfaceVariant)
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Back",
-                tint = Color(0xFF262626)
+                tint = AppColors.TextPrimary
             )
         }
 
@@ -62,27 +64,25 @@ fun PasswordResetConfirmationScreen(
             modifier = Modifier
                 .size(120.dp)
                 .clip(CircleShape)
-                .background(Color(0x1A262626)),
-            tint = Color(0xFFFFB74D)
+                .background(AppColors.PrimaryLight),
+            tint = AppColors.Primary
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         Text(
             text = "We Sent you an Email to reset your password.",
-            textAlign = TextAlign.Center,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF262626)
+            style = MaterialTheme.typography.titleLarge.copy(
+                color = AppColors.TextPrimary,
+                textAlign = TextAlign.Center
+            )
         )
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         ContinueButton(
-            modifier = Modifier.size(width = 200.dp, height = 47.dp),
+            modifier = Modifier.size(width = 200.dp, height = AppDimensions.ButtonHeightMedium),
             label = "Return to Login",
-            minWidth = 200.dp,
-            minHeight = 47.dp,
             onClick = onReturnToLoginClick
         )
     }

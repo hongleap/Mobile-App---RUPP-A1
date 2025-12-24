@@ -16,6 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import com.example.app.blockchain.config.TokenConfig
 import com.example.app.blockchain.data.TokenTransaction
 import com.example.app.blockchain.data.TransactionStatus
@@ -267,7 +269,7 @@ fun TokenTransferScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .verticalScroll(rememberScrollState())
-                .padding(16.dp),
+                .padding(AppDimensions.SpacingL),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (walletAddress == null) {
@@ -279,7 +281,7 @@ fun TokenTransferScreen(
                 ) {
                     Text(
                         text = "Please connect your wallet first",
-                        modifier = Modifier.padding(16.dp),
+                        modifier = Modifier.padding(AppDimensions.SpacingL),
                         color = MaterialTheme.colorScheme.onErrorContainer
                     )
                 }
@@ -288,33 +290,33 @@ fun TokenTransferScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    shape = RoundedCornerShape(16.dp),
+                        .padding(bottom = AppDimensions.SpacingL),
+                    shape = RoundedCornerShape(AppDimensions.RadiusL),
                     colors = CardDefaults.cardColors(
                         containerColor = if (isMetaMaskInstalled) 
-                            Color(0xFFE8F5E9) 
+                            AppColors.Success.copy(alpha = 0.1f) 
                         else 
-                            Color(0xFFFFF3E0)
+                            AppColors.Warning.copy(alpha = 0.1f)
                     )
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(AppDimensions.SpacingL),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                        horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
                     ) {
                         Text(
                             text = if (isMetaMaskInstalled) "✓" else "⚠",
-                            fontSize = 24.sp,
-                            color = if (isMetaMaskInstalled) Color(0xFF4CAF50) else Color(0xFFFF9800)
+                            style = MaterialTheme.typography.headlineSmall,
+                            color = if (isMetaMaskInstalled) AppColors.Success else AppColors.Warning
                         )
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = if (isMetaMaskInstalled) "MetaMask Ready" else "MetaMask Not Detected",
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = if (isMetaMaskInstalled) Color(0xFF2E7D32) else Color(0xFFE65100)
+                                color = if (isMetaMaskInstalled) AppColors.Success else AppColors.Warning
                             )
                             Text(
                                 text = if (isMetaMaskInstalled) 
@@ -322,7 +324,7 @@ fun TokenTransferScreen(
                                 else 
                                     "Please install MetaMask to complete transactions",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = if (isMetaMaskInstalled) Color(0xFF2E7D32) else Color(0xFFE65100)
+                                color = if (isMetaMaskInstalled) AppColors.Success else AppColors.Warning
                             )
                         }
                     }
@@ -332,16 +334,16 @@ fun TokenTransferScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 16.dp),
-                    shape = RoundedCornerShape(16.dp)
+                        .padding(bottom = AppDimensions.SpacingL),
+                    shape = RoundedCornerShape(AppDimensions.RadiusL)
                 ) {
                     Column(
-                        modifier = Modifier.padding(20.dp)
+                        modifier = Modifier.padding(AppDimensions.SpacingXXL)
                     ) {
                         Text(
                             text = "Available Balance",
                             style = MaterialTheme.typography.titleMedium,
-                            color = Color.Gray
+                            color = AppColors.TextSecondary
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
@@ -349,7 +351,8 @@ fun TokenTransferScreen(
                                 "${TokenService.formatTokenAmount(it)} ${TokenConfig.TOKEN_SYMBOL}"
                             } ?: "Loading...",
                             style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.TextPrimary
                         )
                     }
                 }
@@ -384,15 +387,22 @@ fun TokenTransferScreen(
                     isError = recipient.isNotBlank() && !TokenService.isValidAddress(recipient),
                     supportingText = {
                         if (isStorePayment) {
-                            Text("Store payment address (cannot be changed)", color = androidx.compose.ui.graphics.Color(0xFF4CAF50))
+                            Text("Store payment address (cannot be changed)", color = AppColors.Success)
                         } else if (recipient.isNotBlank() && !TokenService.isValidAddress(recipient)) {
                             Text("Invalid address format. Must be 0x followed by 40 hex characters.")
                         } else if (recipient.isBlank() && recipientAddress.isNotBlank()) {
                             Text("Store address: ${WalletManager.getShortAddress(recipientAddress)}")
                         } else if (recipient.isNotBlank() && TokenService.isValidAddress(recipient)) {
-                            Text("Valid address", color = androidx.compose.ui.graphics.Color(0xFF4CAF50))
+                            Text("Valid address", color = AppColors.Success)
                         }
-                    }
+                    },
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = AppColors.SurfaceVariant,
+                        unfocusedContainerColor = AppColors.SurfaceVariant,
+                        focusedIndicatorColor = AppColors.Primary,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    shape = RoundedCornerShape(AppDimensions.RadiusM)
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -409,7 +419,14 @@ fun TokenTransferScreen(
                     placeholder = { Text("0.0") },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    enabled = !isLoading
+                    enabled = !isLoading,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = AppColors.SurfaceVariant,
+                        unfocusedContainerColor = AppColors.SurfaceVariant,
+                        focusedIndicatorColor = AppColors.Primary,
+                        unfocusedIndicatorColor = Color.Transparent
+                    ),
+                    shape = RoundedCornerShape(AppDimensions.RadiusM)
                 )
                 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -424,7 +441,7 @@ fun TokenTransferScreen(
                     Text("Use Max")
                 }
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
                 
                 // Transfer Button
                 if (!successMessage.isNullOrEmpty()) {
@@ -451,7 +468,7 @@ fun TokenTransferScreen(
                         modifier = Modifier.fillMaxWidth(),
                         enabled = !isLoading,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4CAF50)
+                            containerColor = AppColors.Success
                         )
                     ) {
                         if (isLoading) {
@@ -466,7 +483,7 @@ fun TokenTransferScreen(
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
                     
                     // Back button
                     OutlinedButton(
@@ -501,34 +518,34 @@ fun TokenTransferScreen(
                 
                 // Error message
                 errorMessage?.let { error ->
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer
+                            containerColor = AppColors.Error.copy(alpha = 0.1f)
                         )
                     ) {
                         Text(
                             text = error,
-                            modifier = Modifier.padding(16.dp),
-                            color = MaterialTheme.colorScheme.onErrorContainer
+                            modifier = Modifier.padding(AppDimensions.SpacingL),
+                            color = AppColors.Error
                         )
                     }
                 }
                 
                 // Success message
                 successMessage?.let { success ->
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                            containerColor = AppColors.Primary.copy(alpha = 0.1f)
                         )
                     ) {
                         Text(
                             text = success,
-                            modifier = Modifier.padding(16.dp),
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            modifier = Modifier.padding(AppDimensions.SpacingL),
+                            color = AppColors.Primary
                         )
                     }
                 }

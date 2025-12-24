@@ -14,10 +14,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -39,6 +41,8 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 
@@ -72,22 +76,22 @@ fun SearchScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
         
         // Search bar with back button
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically
         ) {
             IconButton(onClick = onBackClick) {
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
 
@@ -96,8 +100,8 @@ fun SearchScreen(
                 onValueChange = { searchQuery = it },
                 modifier = Modifier
                     .weight(1f)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(Color(0xFFF4F4F4))
+                    .clip(RoundedCornerShape(AppDimensions.RadiusXL))
+                    .background(AppColors.SurfaceVariant)
                     .focusRequester(focusRequester),
                 placeholder = { Text("Search") },
                 leadingIcon = {
@@ -105,7 +109,7 @@ fun SearchScreen(
                         Icon(
                             imageVector = Icons.Default.Search,
                             contentDescription = "Search",
-                            tint = Color(0xFF666666)
+                            tint = AppColors.TextSecondary
                         )
                     }
                 },
@@ -115,14 +119,14 @@ fun SearchScreen(
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = "Clear",
-                                tint = Color(0xFF666666)
+                                tint = AppColors.TextSecondary
                             )
                         }
                     }
                 },
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFF4F4F4),
-                    unfocusedContainerColor = Color(0xFFF4F4F4),
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
@@ -139,12 +143,11 @@ fun SearchScreen(
         // Shop by Categories title
         Text(
             text = "Shop by Categories",
-            modifier = Modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = AppDimensions.SpacingL),
             style = MaterialTheme.typography.headlineSmall.copy(
                 fontWeight = FontWeight.Bold,
-                fontSize = 20.sp
-            ),
-            color = Color(0xFF262626)
+                color = AppColors.TextPrimary
+            )
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -175,30 +178,31 @@ private fun CategoryRow(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
-                .padding(horizontal = 16.dp, vertical = 16.dp),
+                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Category icon placeholder
             Box(
                 modifier = Modifier
                     .size(60.dp)
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFE8E8E8))
+                    .clip(RoundedCornerShape(AppDimensions.RadiusS))
+                    .background(AppColors.SurfaceVariant)
             )
 
-            Spacer(modifier = Modifier.size(16.dp))
+            Spacer(modifier = Modifier.width(AppDimensions.SpacingL))
 
             Text(
                 text = category.name,
-                fontSize = 16.sp,
-                color = Color(0xFF262626),
+                style = MaterialTheme.typography.bodyLarge.copy(
+                    color = AppColors.TextPrimary
+                ),
                 modifier = Modifier.weight(1f)
             )
 
-            Text(
-                text = ">",
-                fontSize = 18.sp,
-                color = Color(0xFF666666)
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "Navigate",
+                tint = AppColors.TextTertiary
             )
         }
 
@@ -208,8 +212,8 @@ private fun CategoryRow(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(1.dp)
-                    .padding(horizontal = 16.dp)
-                    .background(Color(0xFFE0E0E0))
+                    .padding(horizontal = AppDimensions.SpacingL)
+                    .background(AppColors.SurfaceVariant)
             )
         }
     }

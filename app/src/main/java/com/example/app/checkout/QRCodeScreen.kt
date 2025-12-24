@@ -31,6 +31,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 @Composable
 fun QRCodeScreen(
@@ -46,13 +48,13 @@ fun QRCodeScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
         // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingXXL),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -60,16 +62,15 @@ fun QRCodeScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
             Text(
                 text = "QR Code",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                ),
-                color = Color(0xFF262626)
+                    color = AppColors.TextPrimary
+                )
             )
             Spacer(modifier = Modifier.size(48.dp))
         }
@@ -79,34 +80,35 @@ fun QRCodeScreen(
                 .weight(1f)
                 .fillMaxWidth()
                 .verticalScroll(scrollState)
-                .padding(horizontal = 16.dp),
+                .padding(horizontal = AppDimensions.SpacingL),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
             // QR Code placeholder
             Box(
                 modifier = Modifier
                     .size(280.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(Color.White)
-                    .padding(16.dp),
+                    .clip(RoundedCornerShape(AppDimensions.RadiusL))
+                    .background(AppColors.Surface)
+                    .padding(AppDimensions.SpacingL),
                 contentAlignment = Alignment.Center
             ) {
                 // QR Code pattern placeholder
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .background(Color(0xFFE8E8E8))
-                        .clip(RoundedCornerShape(8.dp)),
+                        .background(AppColors.SurfaceVariant)
+                        .clip(RoundedCornerShape(AppDimensions.RadiusS)),
                     contentAlignment = Alignment.Center
                 ) {
                     // Center logo/text
                     Text(
                         text = "Clot",
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF262626)
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = AppColors.TextPrimary
+                        )
                     )
                 }
             }
@@ -127,19 +129,20 @@ fun QRCodeScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(AppDimensions.RadiusM))
                     .clickable(onClick = onConfirm),
-                colors = CardDefaults.cardColors(containerColor = Color(0xFF2D2D2D))
+                colors = CardDefaults.cardColors(containerColor = AppColors.Primary)
             ) {
                 Text(
                     text = "Confirm",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(vertical = AppDimensions.SpacingL),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextOnPrimary
+                    )
                 )
             }
 
@@ -164,13 +167,15 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Subtotal",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary
+                )
             )
             Text(
                 text = "$${String.format("%.2f", subtotal)}",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary
+                )
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -180,13 +185,15 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Shipping Cost",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary
+                )
             )
             Text(
                 text = "$${String.format("%.2f", shippingCost)}",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary
+                )
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -196,13 +203,15 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Tax",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary
+                )
             )
             Text(
                 text = "$${String.format("%.2f", tax)}",
-                fontSize = 14.sp,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.bodyMedium.copy(
+                    color = AppColors.TextPrimary
+                )
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
@@ -212,15 +221,17 @@ private fun OrderSummarySection(
         ) {
             Text(
                 text = "Total",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                )
             )
             Text(
                 text = "$${String.format("%.2f", total)}",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF262626)
+                style = MaterialTheme.typography.titleMedium.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                )
             )
         }
     }

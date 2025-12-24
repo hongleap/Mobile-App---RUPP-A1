@@ -45,6 +45,8 @@ import com.example.app.auth.AuthRepository
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.collectAsState
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,52 +67,55 @@ fun CreateAccountScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color.White)
-            .padding(horizontal = 24.dp, vertical = 16.dp),
+            .background(AppColors.Background)
+            .padding(horizontal = AppDimensions.SpacingXXXL, vertical = AppDimensions.SpacingL),
         horizontalAlignment = Alignment.Start
     ) {
         IconButton(
             onClick = onBackClick,
             modifier = Modifier
-                .size(40.dp)
+                .size(AppDimensions.ButtonHeightSmall)
                 .clip(CircleShape)
-                .background(Color(0xFFF2F2F2))
+                .background(AppColors.SurfaceVariant)
         ) {
             Icon(
                 imageVector = Icons.Default.ArrowBack,
                 contentDescription = "Back",
-                tint = Color(0xFF262626)
+                tint = AppColors.TextPrimary
             )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         Text(
             text = "Create Account",
-            fontSize = 28.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF262626)
+            style = MaterialTheme.typography.headlineLarge.copy(
+                color = AppColors.TextPrimary,
+                fontWeight = FontWeight.Bold
+            )
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         val textFieldColors = TextFieldDefaults.colors(
-            focusedContainerColor = Color(0xFFF5F5F5),
-            unfocusedContainerColor = Color(0xFFF5F5F5),
+            focusedContainerColor = AppColors.SurfaceVariant,
+            unfocusedContainerColor = AppColors.SurfaceVariant,
             focusedIndicatorColor = Color.Transparent,
-            unfocusedIndicatorColor = Color.Transparent
+            unfocusedIndicatorColor = Color.Transparent,
+            focusedTextColor = AppColors.TextPrimary,
+            unfocusedTextColor = AppColors.TextPrimary
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+        Column(verticalArrangement = Arrangement.spacedBy(AppDimensions.SpacingL)) {
             TextField(
                 value = firstName,
                 onValueChange = { firstName = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFF5F5F5)),
-                placeholder = { Text("Firstname") },
+                    .height(AppDimensions.ButtonHeightMedium),
+                placeholder = { Text("Firstname", color = AppColors.TextTertiary) },
                 colors = textFieldColors,
+                shape = RoundedCornerShape(AppDimensions.RadiusM),
                 singleLine = true
             )
 
@@ -119,10 +124,10 @@ fun CreateAccountScreen(
                 onValueChange = { lastName = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFF5F5F5)),
-                placeholder = { Text("Lastname") },
+                    .height(AppDimensions.ButtonHeightMedium),
+                placeholder = { Text("Lastname", color = AppColors.TextTertiary) },
                 colors = textFieldColors,
+                shape = RoundedCornerShape(AppDimensions.RadiusM),
                 singleLine = true
             )
 
@@ -131,10 +136,10 @@ fun CreateAccountScreen(
                 onValueChange = { email = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFF5F5F5)),
-                placeholder = { Text("Email Address") },
+                    .height(AppDimensions.ButtonHeightMedium),
+                placeholder = { Text("Email Address", color = AppColors.TextTertiary) },
                 colors = textFieldColors,
+                shape = RoundedCornerShape(AppDimensions.RadiusM),
                 singleLine = true
             )
 
@@ -143,22 +148,22 @@ fun CreateAccountScreen(
                 onValueChange = { password = it },
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(8.dp))
-                    .background(Color(0xFFF5F5F5)),
-                placeholder = { Text("Password") },
+                    .height(AppDimensions.ButtonHeightMedium),
+                placeholder = { Text("Password", color = AppColors.TextTertiary) },
                 colors = textFieldColors,
+                shape = RoundedCornerShape(AppDimensions.RadiusM),
                 singleLine = true,
                 visualTransformation = PasswordVisualTransformation(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
             )
         }
 
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
         ContinueButton(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(56.dp),
+                .height(AppDimensions.ButtonHeightMedium),
             onClick = {
                 if (firstName.isNotBlank() && lastName.isNotBlank() && email.isNotBlank() && password.isNotBlank()) {
                     isLoading = true
@@ -186,28 +191,25 @@ fun CreateAccountScreen(
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingL))
 
         Text(
             text = "Already have an account? Sign in",
-            style = LocalTextStyle.current.copy(
-                color = Color(0xFF262626),
-                textAlign = TextAlign.Start,
-                fontSize = 12.sp
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = AppColors.TextSecondary,
+                textAlign = TextAlign.Start
             ),
             modifier = Modifier
-                .padding(top = 8.dp)
                 .clickable(onClick = onBackClick)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
 
         Text(
             text = "Forgot Password ? Reset",
-            style = LocalTextStyle.current.copy(
-                color = Color(0xFF262626),
-                textAlign = TextAlign.Start,
-                fontSize = 12.sp
+            style = MaterialTheme.typography.bodyMedium.copy(
+                color = AppColors.TextSecondary,
+                textAlign = TextAlign.Start
             ),
             modifier = Modifier.clickable(onClick = onForgotPasswordClick)
         )

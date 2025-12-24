@@ -36,6 +36,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.app.ui.AppColors
+import com.example.app.ui.AppDimensions
 import androidx.compose.runtime.rememberCoroutineScope
 import kotlinx.coroutines.launch
 import com.example.app.profile.data.Address
@@ -61,13 +63,13 @@ fun AddAddressScreen(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFF5F5F5))
+            .background(AppColors.Background)
     ) {
         // Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 20.dp),
+                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingXXL),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -75,16 +77,15 @@ fun AddAddressScreen(
                 Icon(
                     imageVector = Icons.Default.ArrowBack,
                     contentDescription = "Back",
-                    tint = Color(0xFF262626)
+                    tint = AppColors.TextPrimary
                 )
             }
             Text(
                 text = "Add Address",
                 style = MaterialTheme.typography.headlineSmall.copy(
                     fontWeight = FontWeight.Bold,
-                    fontSize = 24.sp
-                ),
-                color = Color(0xFF262626)
+                    color = AppColors.TextPrimary
+                )
             )
             Spacer(modifier = Modifier.size(48.dp))
         }
@@ -93,9 +94,9 @@ fun AddAddressScreen(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = AppDimensions.SpacingL)
         ) {
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
 
             // Full Name
             OutlinedTextField(
@@ -104,12 +105,12 @@ fun AddAddressScreen(
                 label = { Text("Full Name") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFF0F0F0),
-                    unfocusedContainerColor = Color(0xFFF0F0F0),
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(AppDimensions.RadiusM)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -121,12 +122,12 @@ fun AddAddressScreen(
                 label = { Text("Phone Number") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFF0F0F0),
-                    unfocusedContainerColor = Color(0xFFF0F0F0),
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(AppDimensions.RadiusM)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -138,12 +139,12 @@ fun AddAddressScreen(
                 label = { Text("Address Line 1") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFF0F0F0),
-                    unfocusedContainerColor = Color(0xFFF0F0F0),
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(AppDimensions.RadiusM)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -155,12 +156,12 @@ fun AddAddressScreen(
                 label = { Text("Address Line 2 (Optional)") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFF0F0F0),
-                    unfocusedContainerColor = Color(0xFFF0F0F0),
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(AppDimensions.RadiusM)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -172,12 +173,12 @@ fun AddAddressScreen(
                 label = { Text("City") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFF0F0F0),
-                    unfocusedContainerColor = Color(0xFFF0F0F0),
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(AppDimensions.RadiusM)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -185,7 +186,7 @@ fun AddAddressScreen(
             // State and Zip Code
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingM)
             ) {
                 OutlinedTextField(
                     value = state,
@@ -193,12 +194,12 @@ fun AddAddressScreen(
                     label = { Text("State") },
                     modifier = Modifier.weight(1f),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFF0F0F0),
-                        unfocusedContainerColor = Color(0xFFF0F0F0),
+                        focusedContainerColor = AppColors.SurfaceVariant,
+                        unfocusedContainerColor = AppColors.SurfaceVariant,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(AppDimensions.RadiusM)
                 )
                 OutlinedTextField(
                     value = zipCode,
@@ -206,12 +207,12 @@ fun AddAddressScreen(
                     label = { Text("Zip Code") },
                     modifier = Modifier.weight(1f),
                     colors = TextFieldDefaults.colors(
-                        focusedContainerColor = Color(0xFFF0F0F0),
-                        unfocusedContainerColor = Color(0xFFF0F0F0),
+                        focusedContainerColor = AppColors.SurfaceVariant,
+                        unfocusedContainerColor = AppColors.SurfaceVariant,
                         focusedIndicatorColor = Color.Transparent,
                         unfocusedIndicatorColor = Color.Transparent
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(AppDimensions.RadiusM)
                 )
             }
 
@@ -224,12 +225,12 @@ fun AddAddressScreen(
                 label = { Text("Country") },
                 modifier = Modifier.fillMaxWidth(),
                 colors = TextFieldDefaults.colors(
-                    focusedContainerColor = Color(0xFFF0F0F0),
-                    unfocusedContainerColor = Color(0xFFF0F0F0),
+                    focusedContainerColor = AppColors.SurfaceVariant,
+                    unfocusedContainerColor = AppColors.SurfaceVariant,
                     focusedIndicatorColor = Color.Transparent,
                     unfocusedIndicatorColor = Color.Transparent
                 ),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(AppDimensions.RadiusM)
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -245,8 +246,9 @@ fun AddAddressScreen(
                 )
                 Text(
                     text = "Set as default address",
-                    fontSize = 14.sp,
-                    color = Color(0xFF262626)
+                    style = MaterialTheme.typography.bodyMedium.copy(
+                        color = AppColors.TextPrimary
+                    )
                 )
             }
 
@@ -256,7 +258,7 @@ fun AddAddressScreen(
             Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
+                    .clip(RoundedCornerShape(AppDimensions.RadiusM))
                     .clickable(enabled = !isLoading && fullName.isNotBlank() && addressLine1.isNotBlank() && city.isNotBlank() && state.isNotBlank() && zipCode.isNotBlank()) {
                         isLoading = true
                         scope.launch {
@@ -283,22 +285,23 @@ fun AddAddressScreen(
                     },
                 colors = CardDefaults.cardColors(
                     containerColor = if (isLoading || fullName.isBlank() || addressLine1.isBlank() || city.isBlank() || state.isBlank() || zipCode.isBlank()) 
-                        Color(0xFF999999) else Color(0xFF2D2D2D)
+                        AppColors.TextTertiary else AppColors.Primary
                 )
             ) {
                 Text(
                     text = if (isLoading) "Saving..." else "Save",
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 16.dp),
+                        .padding(vertical = AppDimensions.SpacingL),
                     textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                        color = AppColors.TextOnPrimary
+                    )
                 )
             }
 
-            Spacer(modifier = Modifier.height(32.dp))
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingXXXL))
         }
     }
 }
