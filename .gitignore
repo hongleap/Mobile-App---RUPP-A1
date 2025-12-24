@@ -28,3 +28,7 @@ local.properties
 # Firebase configuration files with sensitive API keys
 /app/google-services.json
 /web/config.js
+**/firebase-service-account.json
+**/serviceAccountKey.json
+*.json.enc
+.env*
