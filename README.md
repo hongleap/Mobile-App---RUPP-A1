@@ -4,13 +4,28 @@ A professional, full-stack e-commerce solution featuring a **Kotlin Android App*
 
 ---
 
+## �️ Prerequisites & Setup
+
+### 🔐 1. Firebase Service Account (Required for Backend)
+1. Go to the [Firebase Console](https://console.firebase.google.com/) -> Project Settings -> Service Accounts.
+2. Click **Generate new private key** and download the JSON file.
+3. Rename the file to `firebase-service-account.json`.
+4. **Place the file** in the `services/` root directory.
+
+> [!IMPORTANT]
+> **Security Note**: This file is shared across all microservices using Docker volumes. It is excluded from Git via `.gitignore`. You must manually place it in the `services/` directory for the backend to function correctly.
+
+### 📱 2. Android Google Services
+1. Place your `google-services.json` in the `app/` directory.
+
+---
+
 ## 🚀 Quick Start (Get Running in 5 Mins)
 
 ### 1. Backend (The Brain)
 ```bash
 cd services
-# 1. Place your firebase-service-account.json in the services/ root directory
-# 2. Start everything with one command
+# Ensure firebase-service-account.json is in this folder!
 docker compose up --build -d
 ```
 *Backend is now live at `http://localhost:8080`*
@@ -25,8 +40,7 @@ npm run dev
 
 ### 3. Android App (The Storefront)
 1. Open the `app/` folder in **Android Studio**.
-2. Place `google-services.json` in `app/`.
-3. Press **Run** (Shift + F10).
+2. Press **Run** (Shift + F10).
 
 ---
 
@@ -72,15 +86,6 @@ We use **Docker** to make setup effortless. Each service handles a specific part
 | **Order Service** | `8092` | Checkout, Order History, Admin Stats |
 | **Notification Service**| `9093` | Push Notifications, Alerts |
 | **Transaction Service** | `9094` | Blockchain Verification, Replay Protection |
-
-### 🔐 Firebase Setup
-1. Go to the [Firebase Console](https://console.firebase.google.com/) -> Project Settings -> Service Accounts.
-2. Click **Generate new private key** and download the JSON file.
-3. Rename the file to `firebase-service-account.json`.
-4. **Place the file** in the `services/` root directory.
-
-> [!IMPORTANT]
-> **Security Note**: This file is shared across all microservices using Docker volumes. It is excluded from Git via `.gitignore` to prevent security leaks. You must manually place it in the `services/` directory for the backend to function correctly.
 
 ---
 
