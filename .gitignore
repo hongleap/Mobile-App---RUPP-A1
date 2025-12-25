@@ -22,7 +22,7 @@ local.properties
 # Web folder - separate from mobile app
 # This folder contains admin dashboard and web tools
 # It is NOT included in the Android app build
-/web/node_modules/
+**/node_modules/
 /web/serviceAccountKey.json
 
 # Firebase configuration files with sensitive API keys
