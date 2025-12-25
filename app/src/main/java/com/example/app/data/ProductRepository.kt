@@ -36,7 +36,8 @@ object ProductRepository {
                 gender = product.gender,
                 onSale = product.onSale,
                 freeShipping = product.freeShipping,
-                stock = product.stock
+                stock = product.stock,
+                images = product.images
             )
         }
     }
@@ -47,6 +48,20 @@ object ProductRepository {
     
     fun getProductsByCategory(category: String): List<Product> {
         return _products.value.filter { it.category.equals(category, ignoreCase = true) }
+    }
+    
+    fun getTopSellingProducts(limit: Int = 10): List<Product> {
+        return _products.value.sortedByDescending { it.salesCount }.take(limit)
+    }
+    
+    fun getNewInProducts(limit: Int = 10): List<Product> {
+        // Since we don't have createdAt in Kotlin model yet, we use id as a proxy 
+        // or just take the latest from the list if the API already sorts by newest
+        return _products.value.take(limit)
+    }
+    
+    suspend fun getActiveBanners(): List<com.example.app.data.model.Banner> {
+        return com.example.app.api.ApiClient.getActiveBanners()
     }
 }
 

@@ -32,9 +32,11 @@ if (fs.existsSync(serviceAccountPath)) {
 }
 
 
+const path = require('path');
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Service URLs
 const productServiceUrl = process.env.PRODUCT_SERVICE_URL || 'http://localhost:8081';
@@ -79,6 +81,11 @@ const proxyRequest = async (req, res, targetUrl, requiresAuth = false) => {
         // Remove Authorization header before forwarding to internal services
         delete config.headers['authorization'];
 
+        // Remove Content-Length and Content-Type to let axios handle them based on the body
+        // This prevents "socket hang up" due to size mismatch between original and re-serialized body
+        delete config.headers['content-length'];
+        delete config.headers['content-type'];
+
         const response = await axios(config);
         res.status(response.status).send(response.data);
     } catch (error) {
@@ -92,6 +99,12 @@ const proxyRequest = async (req, res, targetUrl, requiresAuth = false) => {
 };
 
 // Product Service Routes
+app.get('/api/banners/active', (req, res) => proxyRequest(req, res, `${productServiceUrl}/api/banners/active`));
+app.get('/api/banners', verifyToken, (req, res) => proxyRequest(req, res, `${productServiceUrl}/api/banners`, true));
+app.post('/api/banners', verifyToken, (req, res) => proxyRequest(req, res, `${productServiceUrl}/api/banners`, true));
+app.put('/api/banners/:id', verifyToken, (req, res) => proxyRequest(req, res, `${productServiceUrl}/api/banners/${req.params.id}`, true));
+app.delete('/api/banners/:id', verifyToken, (req, res) => proxyRequest(req, res, `${productServiceUrl}/api/banners/${req.params.id}`, true));
+
 app.get('/api/products', (req, res) => proxyRequest(req, res, `${productServiceUrl}/api/products`));
 app.get('/api/products/:id', (req, res) => proxyRequest(req, res, `${productServiceUrl}/api/products/${req.params.id}`));
 app.get('/api/products/category/:category', (req, res) => proxyRequest(req, res, `${productServiceUrl}/api/products/category/${req.params.category}`));

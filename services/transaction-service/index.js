@@ -1,38 +1,24 @@
 const express = require('express');
-const admin = require('firebase-admin');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
-const fs = require('fs');
 require('dotenv').config();
+
+const Transaction = require('./models/Transaction');
+const ConsumedTransaction = require('./models/ConsumedTransaction');
 
 const app = express();
 const port = process.env.PORT || 8084;
 
-// Initialize Firebase Admin SDK
-const serviceAccountPath = './firebase-service-account.json';
-let db;
-
-if (fs.existsSync(serviceAccountPath)) {
-    try {
-        const serviceAccount = require(serviceAccountPath);
-
-        // Fix private key formatting if it contains literal \n
-        if (serviceAccount.private_key && serviceAccount.private_key.includes('\\n')) {
-            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
-        }
-
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
-        db = admin.firestore();
-        console.log('Firebase Admin SDK initialized successfully');
-    } catch (error) {
-        console.error('WARNING: Failed to initialize Firebase:', error.message);
-    }
+// MongoDB Connection
+const mongodbUri = process.env.MONGODB_URI;
+if (mongodbUri) {
+    mongoose.connect(mongodbUri)
+        .then(() => console.log('Connected to MongoDB Atlas'))
+        .catch(err => console.error('MongoDB connection error:', err));
 } else {
-    console.warn('WARNING: firebase-service-account.json not found. Firebase operations will fail.');
+    console.warn('WARNING: MONGODB_URI not found. Database operations will fail.');
 }
-
 
 app.use(cors());
 app.use(express.json());
@@ -41,8 +27,9 @@ app.use(morgan('dev'));
 app.get('/', (req, res) => {
     res.json({
         service: 'Transaction Service',
-        version: '1.0.0',
-        status: 'running'
+        version: '1.1.0',
+        status: 'running',
+        database: 'mongodb'
     });
 });
 
@@ -59,17 +46,19 @@ app.post('/api/transactions/mark-consumed', async (req, res) => {
     }
 
     try {
-        const transactionData = {
+        const consumedTx = new ConsumedTransaction({
             transactionHash,
             userId,
             amount: amount || '0',
-            timestamp: timestamp || Date.now(),
-            createdAt: Date.now()
-        };
+            timestamp: timestamp || Date.now()
+        });
 
-        await db.collection('consumed_transactions').doc(transactionHash).set(transactionData);
+        await consumedTx.save();
         res.json({ success: true, message: 'Transaction marked as consumed' });
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ success: false, error: 'Transaction already consumed' });
+        }
         res.status(500).json({ success: false, error: error.message });
     }
 });
@@ -77,8 +66,8 @@ app.post('/api/transactions/mark-consumed', async (req, res) => {
 // Check if a transaction is consumed
 app.get('/api/transactions/is-consumed/:txHash', async (req, res) => {
     try {
-        const doc = await db.collection('consumed_transactions').doc(req.params.txHash).get();
-        res.json({ success: true, data: { consumed: doc.exists } });
+        const consumed = await ConsumedTransaction.exists({ transactionHash: req.params.txHash });
+        res.json({ success: true, data: { consumed: !!consumed } });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -92,15 +81,7 @@ app.get('/api/transactions/user-transactions', async (req, res) => {
     }
 
     try {
-        const snapshot = await db.collection('consumed_transactions')
-            .where('userId', '==', userId)
-            .get();
-
-        const transactions = snapshot.docs.map(doc => ({
-            transactionHash: doc.id,
-            ...doc.data()
-        }));
-
+        const transactions = await ConsumedTransaction.find({ userId });
         res.json({ success: true, data: transactions });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
@@ -120,7 +101,7 @@ app.post('/api/transactions/save', async (req, res) => {
     }
 
     try {
-        const transactionData = {
+        const transaction = new Transaction({
             userId,
             transactionHash,
             type,
@@ -128,13 +109,15 @@ app.post('/api/transactions/save', async (req, res) => {
             fromAddress,
             toAddress,
             timestamp,
-            status,
-            createdAt: Date.now()
-        };
+            status
+        });
 
-        await db.collection('transactions').add(transactionData);
+        await transaction.save();
         res.json({ success: true, message: 'Transaction saved' });
     } catch (error) {
+        if (error.code === 11000) {
+            return res.status(400).json({ success: false, error: 'Transaction already exists' });
+        }
         res.status(500).json({ success: false, error: error.message });
     }
 });
@@ -147,16 +130,9 @@ app.get('/api/transactions/history', async (req, res) => {
     }
 
     try {
-        const snapshot = await db.collection('transactions')
-            .where('userId', '==', userId)
-            .orderBy('timestamp', 'desc')
-            .limit(100)
-            .get();
-
-        const transactions = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
+        const transactions = await Transaction.find({ userId })
+            .sort({ timestamp: -1 })
+            .limit(100);
 
         res.json({ success: true, data: transactions });
     } catch (error) {

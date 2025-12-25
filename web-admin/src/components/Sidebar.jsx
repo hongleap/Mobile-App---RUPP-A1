@@ -17,6 +17,7 @@ const Sidebar = () => {
         { path: '/', icon: <LayoutDashboard size={22} />, label: 'Overview' },
         { path: '/products', icon: <Package size={22} />, label: 'Products' },
         { path: '/add-product', icon: <PlusCircle size={22} />, label: 'Add Product' },
+        { path: '/banners', icon: <LayoutDashboard size={22} />, label: 'Banners' },
         { path: '/admins', icon: <Shield size={22} />, label: 'Admins' },
     ];
 

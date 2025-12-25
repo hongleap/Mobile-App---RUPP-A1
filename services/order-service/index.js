@@ -1,40 +1,24 @@
 const express = require('express');
 const axios = require('axios');
-const admin = require('firebase-admin');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
-const fs = require('fs');
 require('dotenv').config();
+
+const Order = require('./models/Order');
 
 const app = express();
 const port = process.env.PORT || 8082;
 
-// Initialize Firebase Admin SDK
-const serviceAccountPath = './firebase-service-account.json';
-let db;
-
-if (fs.existsSync(serviceAccountPath)) {
-    try {
-        const serviceAccount = require(serviceAccountPath);
-
-        // Fix private key formatting if it contains literal \n
-        if (serviceAccount.private_key && serviceAccount.private_key.includes('\\n')) {
-            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
-        }
-
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
-        db = admin.firestore();
-        console.log('Firebase Admin SDK initialized successfully');
-    } catch (error) {
-        console.error('WARNING: Failed to initialize Firebase:', error.message);
-    }
+// MongoDB Connection
+const mongodbUri = process.env.MONGODB_URI;
+if (mongodbUri) {
+    mongoose.connect(mongodbUri)
+        .then(() => console.log('Connected to MongoDB Atlas'))
+        .catch(err => console.error('MongoDB connection error:', err));
 } else {
-    console.warn('WARNING: firebase-service-account.json not found. Firebase operations will fail.');
+    console.warn('WARNING: MONGODB_URI not found. Database operations will fail.');
 }
-
-
 
 app.use(cors());
 app.use(express.json());
@@ -46,8 +30,9 @@ const notificationServiceUrl = process.env.NOTIFICATION_SERVICE_URL || 'http://n
 app.get('/', (req, res) => {
     res.json({
         service: 'Order Service',
-        version: '1.0.0',
-        status: 'running'
+        version: '1.1.0',
+        status: 'running',
+        database: 'mongodb'
     });
 });
 
@@ -59,15 +44,7 @@ app.get('/api/orders', async (req, res) => {
     }
 
     try {
-        const snapshot = await db.collection('orders')
-            .where('userId', '==', userId)
-            .get();
-
-        const orders = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        })).sort((a, b) => b.createdAt - a.createdAt);
-
+        const orders = await Order.find({ userId }).sort({ createdAt: -1 });
         res.json({ success: true, data: orders });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
@@ -82,17 +59,16 @@ app.get('/api/orders/:id', async (req, res) => {
     }
 
     try {
-        const doc = await db.collection('orders').doc(req.params.id).get();
-        if (!doc.exists) {
+        const order = await Order.findById(req.params.id);
+        if (!order) {
             return res.status(404).json({ success: false, error: 'Order not found' });
         }
 
-        const data = doc.data();
-        if (data.userId !== userId) {
+        if (order.userId !== userId) {
             return res.status(403).json({ success: false, error: 'Access denied' });
         }
 
-        res.json({ success: true, data: { id: doc.id, ...data } });
+        res.json({ success: true, data: order });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -100,6 +76,7 @@ app.get('/api/orders/:id', async (req, res) => {
 
 // Create an order
 app.post('/api/orders', async (req, res) => {
+    console.log(`[${new Date().toISOString()}] Received order creation request`);
     const userId = req.headers['x-user-id'];
     if (!userId) {
         return res.status(401).json({ success: false, error: 'User ID is required' });
@@ -113,9 +90,8 @@ app.post('/api/orders', async (req, res) => {
     try {
         const orderNumber = `ORD${Date.now().toString().slice(-8)}`;
         const total = items.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-        const createdAt = Date.now();
 
-        const orderData = {
+        const order = new Order({
             userId,
             orderNumber,
             itemCount: items.length,
@@ -125,32 +101,39 @@ app.post('/api/orders', async (req, res) => {
             customerEmail,
             shippingAddress,
             shippingPhone,
-            createdAt,
             items
-        };
+        });
 
-        const docRef = await db.collection('orders').add(orderData);
+        console.log(`[${new Date().toISOString()}] Saving order ${orderNumber}...`);
+        const saveStart = Date.now();
+        await order.save();
+        console.log(`[${new Date().toISOString()}] Order saved in ${Date.now() - saveStart}ms`);
 
         // Decrease stock (async, don't block response)
-        items.forEach(item => {
-            axios.post(`${productServiceUrl}/api/stock/decrease`, {
-                productId: item.productId,
-                quantity: item.quantity
-            }).catch(err => console.error(`Failed to decrease stock for ${item.productId}:`, err.message));
+        setImmediate(() => {
+            console.log(`[${new Date().toISOString()}] Triggering async stock decrease`);
+            items.forEach(item => {
+                axios.post(`${productServiceUrl}/api/stock/decrease`, {
+                    productId: item.productId,
+                    quantity: item.quantity
+                }, { timeout: 5000 }).catch(err => console.error(`Failed to decrease stock for ${item.productId}:`, err.message));
+            });
         });
 
         // Create notification (async, don't block response)
-        axios.post(`${notificationServiceUrl}/api/notifications`, {
-            userId,
-            message: `${customerName}, you placed an order. Check your order history for full details.`,
-            type: 'order'
-        }).catch(err => console.error(`Failed to create notification:`, err.message));
-
-        res.status(201).json({
-            success: true,
-            data: { id: docRef.id, ...orderData }
+        setImmediate(() => {
+            console.log(`[${new Date().toISOString()}] Triggering async notification`);
+            axios.post(`${notificationServiceUrl}/api/notifications`, {
+                userId,
+                message: `${customerName}, you placed an order. Check your order history for full details.`,
+                type: 'order'
+            }, { timeout: 5000 }).catch(err => console.error(`Failed to create notification:`, err.message));
         });
+
+        console.log(`[${new Date().toISOString()}] Sending response`);
+        res.status(201).json({ success: true, data: order });
     } catch (error) {
+        console.error(`[${new Date().toISOString()}] Error creating order:`, error);
         res.status(500).json({ success: false, error: error.message });
     }
 });
@@ -163,8 +146,11 @@ app.put('/api/orders/:id/status', async (req, res) => {
     }
 
     try {
-        await db.collection('orders').doc(req.params.id).update({ status });
-        res.json({ success: true, message: 'Order status updated' });
+        const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
+        if (!order) {
+            return res.status(404).json({ success: false, error: 'Order not found' });
+        }
+        res.json({ success: true, message: 'Order status updated', data: order });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -173,39 +159,36 @@ app.put('/api/orders/:id/status', async (req, res) => {
 // Admin Stats
 app.get('/api/admin/stats', async (req, res) => {
     try {
-        console.log('Fetching admin stats from Firestore...');
-        const snapshot = await db.collection('orders').get();
-        console.log(`Snapshot size: ${snapshot.size}`);
-        const orders = snapshot.docs.map(doc => doc.data());
-        console.log(`Found ${orders.length} orders in database.`);
+        const stats = await Order.aggregate([
+            {
+                $group: {
+                    _id: null,
+                    totalRevenue: { $sum: "$total" },
+                    totalOrders: { $sum: 1 },
+                    uniqueUsers: { $addToSet: "$userId" }
+                }
+            }
+        ]);
 
-        const totalOrders = orders.length;
-        const totalRevenue = orders.reduce((sum, order) => sum + (parseFloat(order.total) || 0), 0);
+        const result = stats[0] || { totalRevenue: 0, totalOrders: 0, uniqueUsers: [] };
+        const totalOrders = result.totalOrders;
+        const totalRevenue = result.totalRevenue;
+        const activeUsers = result.uniqueUsers.length;
         const avgOrder = totalOrders > 0 ? totalRevenue / totalOrders : 0;
 
-        // Count unique users
-        const uniqueUsers = new Set(orders.map(order => order.userId)).size;
-
-        // Get recent activity (last 5 orders)
-        const recentActivity = snapshot.docs
-            .map(doc => ({ id: doc.id, ...doc.data() }))
-            .sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
-            .slice(0, 5);
-
-        console.log('Stats calculated:', { totalOrders, totalRevenue, uniqueUsers });
+        const recentActivity = await Order.find().sort({ createdAt: -1 }).limit(5);
 
         res.json({
             success: true,
             data: {
                 totalRevenue,
                 totalOrders,
-                activeUsers: uniqueUsers,
+                activeUsers,
                 avgOrder,
                 recentActivity
             }
         });
     } catch (error) {
-        console.error('Error in admin stats:', error);
         res.status(500).json({ success: false, error: error.message });
     }
 });

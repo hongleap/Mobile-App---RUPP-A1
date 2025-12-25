@@ -48,12 +48,21 @@ import androidx.compose.ui.unit.sp
 import com.example.app.ui.AppColors
 import com.example.app.ui.AppDimensions
 import com.example.app.orders.data.Order
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 val orderStatuses = listOf("Processing", "Shipped", "Delivered", "Returned", "Canceled")
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun OrdersScreen(
     orders: List<Order> = emptyList(),
+    isRefreshing: Boolean = false,
+    onRefresh: () -> Unit = {},
     onOrderClick: (String) -> Unit = {},
     onExploreCategories: () -> Unit = {},
     onHomeClick: () -> Unit = {},
@@ -69,53 +78,70 @@ fun OrdersScreen(
         orders.filter { it.status == selectedStatus }
     }
 
-    Column(
+    val pullRefreshState = rememberPullRefreshState(isRefreshing, onRefresh)
+
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(AppColors.Background)
+            .pullRefresh(pullRefreshState)
     ) {
-        // Header
-        Text(
-            text = "Orders",
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingL),
-            style = MaterialTheme.typography.headlineSmall.copy(
-                fontWeight = FontWeight.Bold,
-                color = AppColors.TextPrimary
+                .fillMaxSize()
+                .background(AppColors.Background)
+                .verticalScroll(rememberScrollState())
+        ) {
+            // Header
+            Text(
+                text = "Orders",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = AppDimensions.SpacingL, vertical = AppDimensions.SpacingL),
+                style = MaterialTheme.typography.headlineSmall.copy(
+                    fontWeight = FontWeight.Bold,
+                    color = AppColors.TextPrimary
+                )
             )
+
+            if (orders.isEmpty()) {
+                // Empty state
+                EmptyOrdersState(onExploreCategories = onExploreCategories)
+            } else {
+                // Status filters
+                StatusFilters(
+                    selectedStatus = selectedStatus,
+                    onStatusSelected = { selectedStatus = it }
+                )
+
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
+
+                // Orders list
+                OrdersList(
+                    orders = filteredOrders,
+                    onOrderClick = onOrderClick
+                )
+            }
+
+            if (showBottomNav) {
+                Spacer(modifier = Modifier.weight(1f))
+                BottomNavBar(
+                    selectedTab = "orders",
+                    onHomeClick = onHomeClick,
+                    onOrdersClick = {},
+                    onNotificationsClick = onNotificationsClick,
+                    onProfileClick = onProfileClick
+                )
+                Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
+            }
+        }
+
+        PullRefreshIndicator(
+            refreshing = isRefreshing,
+            state = pullRefreshState,
+            modifier = Modifier.align(Alignment.TopCenter),
+            backgroundColor = AppColors.Surface,
+            contentColor = AppColors.Primary
         )
-
-        if (orders.isEmpty()) {
-            // Empty state
-            EmptyOrdersState(onExploreCategories = onExploreCategories)
-        } else {
-            // Status filters
-            StatusFilters(
-                selectedStatus = selectedStatus,
-                onStatusSelected = { selectedStatus = it }
-            )
-
-            Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
-
-            // Orders list
-            OrdersList(
-                orders = filteredOrders,
-                onOrderClick = onOrderClick
-            )
-        }
-
-        if (showBottomNav) {
-            Spacer(modifier = Modifier.weight(1f))
-            BottomNavBar(
-                selectedTab = "orders",
-                onHomeClick = onHomeClick,
-                onOrdersClick = {},
-                onNotificationsClick = onNotificationsClick,
-                onProfileClick = onProfileClick
-            )
-            Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
-        }
     }
 }
 
@@ -209,6 +235,7 @@ private fun OrderCard(order: Order, onClick: () -> Unit) {
                     com.example.app.ui.ProductImage(
                         productId = firstItem.productId,
                         category = firstItem.category,
+                        imageUrl = firstItem.imageUrl,
                         contentDescription = firstItem.productName,
                         modifier = Modifier.fillMaxSize()
                     )

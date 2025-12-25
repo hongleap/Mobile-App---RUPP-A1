@@ -114,6 +114,42 @@ A high-performance dashboard built with **React + Vite + Lucide Icons**.
 
 ---
 
+## 🌟 New Features (Dec 2025)
+
+### 🎠 Banner Carousel
+- **Multiple Active Banners**: The app now supports rotating through multiple active banners.
+- **Auto-Scroll**: Banners automatically slide every 3 seconds.
+- **Admin Control**: Set multiple banners as "Active" in the dashboard to enable the carousel.
+
+### 🧠 Smart IP Replacement
+- **Team-Ready**: The Android app automatically detects your connection environment.
+- **Dynamic Images**: It replaces the hardcoded database IP (e.g., `192.168.x.x`) with your current server IP.
+- **Benefit**: Share the database with your team without breaking image links!
+
+---
+
+## 🤝 Team Setup Guide (For Teammates)
+
+If you are cloning this repo to run on your own machine:
+
+1.  **Clone the Repo**: `git clone <repo-url>`
+2.  **Setup Secrets**:
+    - Ask the project lead for `firebase-service-account.json` -> put in `services/`.
+    - Ask for `google-services.json` -> put in `app/`.
+    - Ask for `.env` content -> put in `services/.env` and `web-admin/.env`.
+3.  **Run Backend**:
+    ```bash
+    cd services
+    docker compose up -d
+    ```
+4.  **Run Android App**:
+    - Open `app/` in Android Studio.
+    - **Important**: Open `ApiClient.kt` and check `BASE_URL`.
+        - **Emulator**: Leave as `http://10.0.2.2:8080` (Works automatically).
+        - **Physical Phone**: Change to your laptop's IP (e.g., `http://192.168.1.50:8080`).
+
+---
+
 ## 🔍 Troubleshooting
 
 **Q: Dashboard shows $0.00?**
@@ -123,6 +159,11 @@ A high-performance dashboard built with **React + Vite + Lucide Icons**.
 **Q: Android App can't connect?**
 - Make sure you aren't using `localhost`. Use `10.0.2.2` for the emulator.
 - Check if the API Gateway container is up (`docker ps`).
+
+**Q: Images are broken?**
+- The "Smart IP" feature usually fixes this.
+- If using a physical phone, ensure your phone and laptop are on the **same Wi-Fi**.
+- Check if `BASE_URL` in `ApiClient.kt` matches your laptop's IP.
 
 **Q: "Port already allocated" error?**
 - Run `docker compose down` to clear old containers, then try again.

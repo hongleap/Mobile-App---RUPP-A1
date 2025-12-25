@@ -1,75 +1,54 @@
 const express = require('express');
-const admin = require('firebase-admin');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
-const fs = require('fs');
 require('dotenv').config();
+
+const Product = require('./models/Product');
 
 const app = express();
 const port = process.env.PORT || 8081;
 
-// Initialize Firebase Admin SDK
-const serviceAccountPath = './firebase-service-account.json';
-let db;
-
-if (fs.existsSync(serviceAccountPath)) {
-    try {
-        const serviceAccount = require(serviceAccountPath);
-
-        // Fix private key formatting if it contains literal \n
-        if (serviceAccount.private_key && serviceAccount.private_key.includes('\\n')) {
-            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
-        }
-
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
-        db = admin.firestore();
-        console.log('Firebase Admin SDK initialized successfully');
-    } catch (error) {
-        console.error('WARNING: Failed to initialize Firebase:', error.message);
-    }
+// MongoDB Connection
+const mongodbUri = process.env.MONGODB_URI;
+if (mongodbUri) {
+    mongoose.connect(mongodbUri)
+        .then(() => console.log('Connected to MongoDB Atlas'))
+        .catch(err => console.error('MongoDB connection error:', err));
 } else {
-    console.warn('WARNING: firebase-service-account.json not found. Firebase operations will fail.');
+    console.warn('WARNING: MONGODB_URI not found. Database operations will fail.');
 }
-
 
 app.use(cors());
 app.use(express.json());
 app.use(morgan('dev'));
 
-// Helper to format product
-const formatProduct = (doc) => {
-    const data = doc.data();
-    return {
-        id: doc.id,
-        name: data.name || '',
-        price: data.priceString || (data.price ? `$${data.price.toFixed(2)}` : '$0.00'),
-        images: data.images || [],
-        description: data.description || '',
-        sizes: data.sizes || ['S', 'M', 'L', 'XL', '2XL'],
-        colors: data.colors || [],
-        category: data.category || '',
-        gender: data.gender || '',
-        onSale: data.onSale || false,
-        freeShipping: data.freeShipping || false,
-        stock: data.stock || 0
-    };
-};
-
 app.get('/', (req, res) => {
     res.json({
         service: 'Product Service',
-        version: '1.0.0',
-        status: 'running'
+        version: '1.1.0',
+        status: 'running',
+        database: 'mongodb'
     });
 });
 
 // Get all products
 app.get('/api/products', async (req, res) => {
     try {
-        const snapshot = await db.collection('products').get();
-        const products = snapshot.docs.map(formatProduct);
+        const includeHidden = req.query.includeHidden === 'true';
+        const sort = req.query.sort;
+        const limit = parseInt(req.query.limit) || 0;
+
+        const query = includeHidden ? {} : { isHidden: { $ne: true } };
+
+        let sortQuery = { createdAt: -1 };
+        if (sort === 'sales') {
+            sortQuery = { salesCount: -1 };
+        } else if (sort === 'newest') {
+            sortQuery = { createdAt: -1 };
+        }
+
+        const products = await Product.find(query).sort(sortQuery).limit(limit);
         res.json({ success: true, data: products });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
@@ -79,11 +58,11 @@ app.get('/api/products', async (req, res) => {
 // Get product by ID
 app.get('/api/products/:id', async (req, res) => {
     try {
-        const doc = await db.collection('products').document(req.params.id).get();
-        if (!doc.exists) {
+        const product = await Product.findById(req.params.id);
+        if (!product) {
             return res.status(404).json({ success: false, error: 'Product not found' });
         }
-        res.json({ success: true, data: formatProduct(doc) });
+        res.json({ success: true, data: product });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -92,10 +71,10 @@ app.get('/api/products/:id', async (req, res) => {
 // Get products by category
 app.get('/api/products/category/:category', async (req, res) => {
     try {
-        const snapshot = await db.collection('products')
-            .where('category', '==', req.params.category)
-            .get();
-        const products = snapshot.docs.map(formatProduct);
+        const products = await Product.find({
+            category: req.params.category,
+            isHidden: { $ne: true }
+        });
         res.json({ success: true, data: products });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
@@ -105,12 +84,9 @@ app.get('/api/products/category/:category', async (req, res) => {
 // Create product
 app.post('/api/products', async (req, res) => {
     try {
-        const productData = {
-            ...req.body,
-            createdAt: admin.firestore.FieldValue.serverTimestamp()
-        };
-        const docRef = await db.collection('products').add(productData);
-        res.status(201).json({ success: true, data: { id: docRef.id, ...productData } });
+        const product = new Product(req.body);
+        await product.save();
+        res.status(201).json({ success: true, data: product });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -119,8 +95,11 @@ app.post('/api/products', async (req, res) => {
 // Update product
 app.put('/api/products/:id', async (req, res) => {
     try {
-        await db.collection('products').doc(req.params.id).update(req.body);
-        res.json({ success: true, message: 'Product updated' });
+        const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!product) {
+            return res.status(404).json({ success: false, error: 'Product not found' });
+        }
+        res.json({ success: true, message: 'Product updated', data: product });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -129,14 +108,17 @@ app.put('/api/products/:id', async (req, res) => {
 // Delete product
 app.delete('/api/products/:id', async (req, res) => {
     try {
-        await db.collection('products').doc(req.params.id).delete();
+        const product = await Product.findByIdAndDelete(req.params.id);
+        if (!product) {
+            return res.status(404).json({ success: false, error: 'Product not found' });
+        }
         res.json({ success: true, message: 'Product deleted' });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
-// Decrease stock
+// Decrease stock and increment sales
 app.post('/api/stock/decrease', async (req, res) => {
     const { productId, quantity } = req.body;
     if (!productId || quantity === undefined) {
@@ -144,19 +126,78 @@ app.post('/api/stock/decrease', async (req, res) => {
     }
 
     try {
-        const productRef = db.collection('products').doc(productId);
-        const newStock = await db.runTransaction(async (t) => {
-            const doc = await t.get(productRef);
-            if (!doc.exists) {
-                throw new Error('Product not found');
-            }
-            const currentStock = doc.data().stock || 0;
-            const updatedStock = Math.max(0, currentStock - quantity);
-            t.update(productRef, { stock: updatedStock });
-            return updatedStock;
-        });
+        const product = await Product.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, error: 'Product not found' });
+        }
 
-        res.json({ success: true, data: { newStock } });
+        product.stock = Math.max(0, (product.stock || 0) - quantity);
+        product.salesCount = (product.salesCount || 0) + quantity;
+        await product.save();
+
+        res.json({ success: true, data: { newStock: product.stock, salesCount: product.salesCount } });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// --- Banner Routes ---
+const Banner = require('./models/Banner');
+
+// Get active banner (for app)
+app.get('/api/banners/active', async (req, res) => {
+    try {
+        const banners = await Banner.find({ isActive: true }).sort({ createdAt: -1 });
+        res.json({ success: true, data: banners });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Get all banners (for admin)
+app.get('/api/banners', async (req, res) => {
+    try {
+        const banners = await Banner.find().sort({ createdAt: -1 });
+        res.json({ success: true, data: banners });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Create banner
+app.post('/api/banners', async (req, res) => {
+    try {
+        // Removed logic that deactivates other banners
+        const banner = new Banner(req.body);
+        await banner.save();
+        res.status(201).json({ success: true, data: banner });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Update banner
+app.put('/api/banners/:id', async (req, res) => {
+    try {
+        // Removed logic that deactivates other banners
+        const banner = await Banner.findByIdAndUpdate(req.params.id, req.body, { new: true });
+        if (!banner) {
+            return res.status(404).json({ success: false, error: 'Banner not found' });
+        }
+        res.json({ success: true, data: banner });
+    } catch (error) {
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
+// Delete banner
+app.delete('/api/banners/:id', async (req, res) => {
+    try {
+        const banner = await Banner.findByIdAndDelete(req.params.id);
+        if (!banner) {
+            return res.status(404).json({ success: false, error: 'Banner not found' });
+        }
+        res.json({ success: true, message: 'Banner deleted' });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }

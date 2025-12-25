@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -56,6 +57,7 @@ data class Product(
     val id: String,
     val name: String,
     val price: String,
+    val originalPrice: String? = null,
     val images: List<String> = emptyList(),
     val description: String = "",
     val sizes: List<String> = listOf("S", "M", "L", "XL", "2XL"),
@@ -64,7 +66,9 @@ data class Product(
     val gender: String = "",
     val onSale: Boolean = false,
     val freeShipping: Boolean = false,
-    val stock: Int = 0
+    val stock: Int = 0,
+    val isHidden: Boolean = false,
+    val salesCount: Int = 0
 )
 
 data class ProductColor(
@@ -137,7 +141,11 @@ fun ProductPageScreen(
             }
 
             // Product images carousel
-            ProductImageCarousel(productId = product.id, category = product.category)
+            ProductImageCarousel(
+                productId = product.id,
+                category = product.category,
+                imageUrl = product.images.firstOrNull()
+            )
 
                    // Product details
                    Card(
@@ -160,13 +168,27 @@ fun ProductPageScreen(
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                Text(
-                    text = product.price,
-                    style = MaterialTheme.typography.headlineSmall.copy(
-                        color = AppColors.TextPrimary,
-                        fontWeight = FontWeight.Bold
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (!product.originalPrice.isNullOrEmpty()) {
+                        Text(
+                            text = product.originalPrice,
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                color = AppColors.TextSecondary,
+                                fontWeight = FontWeight.Medium,
+                                textDecoration = TextDecoration.LineThrough
+                            )
+                        )
+                        Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+                    }
+                    
+                    Text(
+                        text = product.price,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            color = if (!product.originalPrice.isNullOrEmpty()) AppColors.AccentRed else AppColors.TextPrimary,
+                            fontWeight = FontWeight.Bold
+                        )
                     )
-                )
+                }
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
@@ -296,7 +318,11 @@ fun ProductPageScreen(
 }
 
 @Composable
-private fun ProductImageCarousel(productId: String?, category: String? = null) {
+private fun ProductImageCarousel(
+    productId: String?,
+    category: String? = null,
+    imageUrl: String? = null
+) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -305,6 +331,7 @@ private fun ProductImageCarousel(productId: String?, category: String? = null) {
         com.example.app.ui.ProductImage(
             productId = productId,
             category = category,
+            imageUrl = imageUrl,
             contentDescription = "Product image",
             modifier = Modifier
                 .fillMaxWidth()

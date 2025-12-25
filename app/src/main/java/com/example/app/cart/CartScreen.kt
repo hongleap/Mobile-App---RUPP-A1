@@ -57,7 +57,8 @@ data class CartItem(
     val quantity: Int = 1,
     val size: String = "",
     val color: String = "",
-    val category: String = ""
+    val category: String = "",
+    val imageUrl: String? = null
 )
 
 @Composable
@@ -277,13 +278,20 @@ private fun CartItemRow(
                 .padding(AppDimensions.SpacingL),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Product image placeholder
+            // Product image
             Box(
                 modifier = Modifier
                     .size(80.dp)
                     .clip(RoundedCornerShape(AppDimensions.RadiusS))
-                    .background(AppColors.SurfaceVariant)
-            )
+            ) {
+                com.example.app.ui.ProductImage(
+                    productId = item.id,
+                    category = item.category,
+                    imageUrl = item.imageUrl,
+                    contentDescription = item.name,
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
 
             Spacer(modifier = Modifier.width(AppDimensions.SpacingM))
 

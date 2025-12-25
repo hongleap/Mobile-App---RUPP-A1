@@ -175,7 +175,10 @@ object ApiClient {
         val images = mutableListOf<String>()
         if (imagesArray != null) {
             for (j in 0 until imagesArray.length()) {
-                images.add(imagesArray.getString(j))
+                val fixedUrl = fixImageUrl(imagesArray.getString(j))
+                if (fixedUrl != null) {
+                    images.add(fixedUrl)
+                }
             }
         }
         
@@ -217,7 +220,9 @@ object ApiClient {
             gender = productObj.optString("gender", ""),
             onSale = productObj.optBoolean("onSale", false),
             freeShipping = productObj.optBoolean("freeShipping", false),
-            stock = productObj.optInt("stock", 0)
+            stock = productObj.optInt("stock", 0),
+            isHidden = productObj.optBoolean("isHidden", false),
+            salesCount = productObj.optInt("salesCount", 0)
         )
     }
     
@@ -270,6 +275,8 @@ object ApiClient {
                         put("price", item.price)
                         put("size", item.size ?: "")
                         put("color", item.color ?: "")
+                        put("category", item.category ?: "")
+                        put("imageUrl", item.imageUrl ?: "")
                     })
                 }
             })
@@ -307,7 +314,9 @@ object ApiClient {
                     quantity = itemObj.getInt("quantity"),
                     price = itemObj.getDouble("price"),
                     size = itemObj.optString("size").takeIf { it.isNotEmpty() },
-                    color = itemObj.optString("color").takeIf { it.isNotEmpty() }
+                    color = itemObj.optString("color").takeIf { it.isNotEmpty() },
+                    category = itemObj.optString("category").takeIf { it.isNotEmpty() },
+                    imageUrl = fixImageUrl(itemObj.optString("imageUrl").takeIf { it.isNotEmpty() })
                 ))
             }
         }
@@ -318,7 +327,12 @@ object ApiClient {
             itemCount = orderObj.getInt("itemCount"),
             status = orderObj.getString("status"),
             total = orderObj.getDouble("total"),
-            createdAt = orderObj.getLong("createdAt"),
+            createdAt = try {
+                orderObj.optLong("createdAt", System.currentTimeMillis())
+            } catch (e: Exception) {
+                // Fallback for ISO string if it somehow still comes through
+                System.currentTimeMillis()
+            },
             items = items,
             customerName = orderObj.optString("customerName", ""),
             customerEmail = orderObj.optString("customerEmail", ""),
@@ -393,6 +407,59 @@ object ApiClient {
             body = body,
             requiresAuth = true
         )
+    }
+
+    suspend fun getActiveBanners(): List<com.example.app.data.model.Banner> {
+        return try {
+            val response = makeRequest("$BASE_URL/api/banners/active")
+            val json = JSONObject(response)
+            if (json.getBoolean("success") && !json.isNull("data")) {
+                val data = json.get("data")
+                val banners = mutableListOf<com.example.app.data.model.Banner>()
+
+                if (data is JSONArray) {
+                    for (i in 0 until data.length()) {
+                        val item = data.getJSONObject(i)
+                        banners.add(parseBanner(item))
+                    }
+                } else if (data is JSONObject) {
+                    banners.add(parseBanner(data))
+                }
+                banners
+            } else {
+                emptyList()
+            }
+        } catch (e: Exception) {
+            println("Error fetching active banners: ${e.message}")
+            emptyList()
+        }
+    }
+
+    private fun parseBanner(data: JSONObject): com.example.app.data.model.Banner {
+        return com.example.app.data.model.Banner(
+            id = data.getString("id"),
+            title = data.getString("title"),
+            subtitle = if (data.has("subtitle")) data.getString("subtitle") else null,
+            discount = if (data.has("discount")) data.getString("discount") else null,
+            imageUrl = fixImageUrl(if (data.has("imageUrl")) data.getString("imageUrl") else null),
+            originalPrice = if (data.has("originalPrice")) data.getString("originalPrice") else null,
+            productId = if (data.has("productId")) data.getString("productId") else null,
+            isActive = data.getBoolean("isActive")
+        )
+    }
+
+    private fun fixImageUrl(originalUrl: String?): String? {
+        if (originalUrl.isNullOrEmpty()) return null
+        if (originalUrl.contains("/images/")) {
+            try {
+                val pathIndex = originalUrl.indexOf("/images/")
+                val path = originalUrl.substring(pathIndex)
+                return "$BASE_URL$path"
+            } catch (e: Exception) {
+                return originalUrl
+            }
+        }
+        return originalUrl
     }
 }
 

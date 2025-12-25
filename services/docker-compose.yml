@@ -6,6 +6,7 @@ services:
       - "8080:8080"
     volumes:
       - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+      - ./api-gateway/public:/app/public
     environment:
       - PRODUCT_SERVICE_URL=http://product-service:8081
       - ORDER_SERVICE_URL=http://order-service:8082
@@ -26,6 +27,8 @@ services:
       - "9091:8081"
     volumes:
       - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
     networks:
       - microservices-network
 
@@ -39,6 +42,7 @@ services:
     environment:
       - PRODUCT_SERVICE_URL=http://product-service:8081
       - NOTIFICATION_SERVICE_URL=http://notification-service:8083
+      - MONGODB_URI=${MONGODB_URI}
     depends_on:
       - product-service
       - notification-service
@@ -52,6 +56,8 @@ services:
       - "9093:8083"
     volumes:
       - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
     networks:
       - microservices-network
 
@@ -62,6 +68,8 @@ services:
       - "9094:8084"
     volumes:
       - ./firebase-service-account.json:/app/firebase-service-account.json:ro
+    environment:
+      - MONGODB_URI=${MONGODB_URI}
     networks:
       - microservices-network
 

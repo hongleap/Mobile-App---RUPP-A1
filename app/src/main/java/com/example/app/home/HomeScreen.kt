@@ -10,6 +10,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -60,6 +66,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -69,8 +76,10 @@ import com.example.app.blockchain.TokenService
 import com.example.app.blockchain.config.TokenConfig
 import androidx.compose.runtime.LaunchedEffect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import java.math.BigDecimal
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     onSeeAllCategories: () -> Unit = {},
@@ -83,22 +92,30 @@ fun HomeScreen(
     onFilterClick: () -> Unit = {},
     onChatClick: () -> Unit = {},
     onProductClick: (String) -> Unit = {},
+    onBannerClick: (com.example.app.data.model.Banner) -> Unit = {},
     showBottomNav: Boolean = true
 ) {
     val scrollState = rememberScrollState()
     val context = LocalContext.current
     var tokenBalance by remember { mutableStateOf<BigDecimal?>(null) }
     
-    // Load token balance
+    var activeBanners by remember { mutableStateOf<List<com.example.app.data.model.Banner>>(emptyList()) }
+
+    // Load token balance and active banners
     LaunchedEffect(Unit) {
-        val walletAddress = WalletManager.getWalletAddress(context)
-        if (walletAddress != null) {
-            TokenService.getTokenBalance(walletAddress).fold(
-                onSuccess = { tokenBalance = it },
-                onFailure = { tokenBalance = BigDecimal.ZERO }
-            )
-        } else {
-            tokenBalance = BigDecimal.ZERO
+        launch {
+            val walletAddress = WalletManager.getWalletAddress(context)
+            if (walletAddress != null) {
+                TokenService.getTokenBalance(walletAddress).fold(
+                    onSuccess = { tokenBalance = it },
+                    onFailure = { tokenBalance = BigDecimal.ZERO }
+                )
+            } else {
+                tokenBalance = BigDecimal.ZERO
+            }
+        }
+        launch {
+            activeBanners = com.example.app.data.ProductRepository.getActiveBanners()
         }
     }
     
@@ -121,7 +138,55 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
         
         // Promotional Banner
-        PromotionBanner()
+        // Promotional Banner Carousel
+        if (activeBanners.isNotEmpty()) {
+            val pagerState = rememberPagerState(pageCount = { activeBanners.size })
+
+            // Auto-scroll
+            LaunchedEffect(pagerState) {
+                while (true) {
+                    delay(3000) // 3 seconds delay
+                    if (activeBanners.isNotEmpty()) {
+                        val nextPage = (pagerState.currentPage + 1) % activeBanners.size
+                        pagerState.animateScrollToPage(nextPage)
+                    }
+                }
+            }
+
+            Column {
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxWidth()
+                ) { page ->
+                    val banner = activeBanners[page]
+                    PromotionBanner(
+                        banner = banner,
+                        onBannerClick = { onBannerClick(banner) }
+                    )
+                }
+                
+                // Page Indicator
+                if (activeBanners.size > 1) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        repeat(activeBanners.size) { iteration ->
+                            val color = if (pagerState.currentPage == iteration) AppColors.Primary else AppColors.TextSecondary.copy(alpha = 0.3f)
+                            Box(
+                                modifier = Modifier
+                                    .padding(2.dp)
+                                    .clip(CircleShape)
+                                    .background(color)
+                                    .size(8.dp)
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
+        }
         
         Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
         SectionHeader(title = "Categories", action = "See All", onAction = onSeeAllCategories)
@@ -131,12 +196,14 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
         SectionHeader(title = "Top Selling", action = "See All", onAction = {})
         Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
-        ProductCarousel(onProductClick = onProductClick)
+        val topSellingProducts = com.example.app.data.ProductRepository.getTopSellingProducts(5)
+        ProductCarousel(products = topSellingProducts, onProductClick = onProductClick)
 
         Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
         SectionHeader(title = "New In", action = "See All", onAction = {})
         Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
-        ProductCarousel(onProductClick = onProductClick)
+        val newInProducts = com.example.app.data.ProductRepository.getNewInProducts(5)
+        ProductCarousel(products = newInProducts, onProductClick = onProductClick)
         
         Spacer(modifier = Modifier.height(AppDimensions.SpacingXXL))
         // Special Offers Section
@@ -398,17 +465,18 @@ private fun CategoriesRow(onSelectCategory: (String) -> Unit) {
 }
 
 @Composable
-private fun ProductCarousel(onProductClick: (String) -> Unit = {}) {
-    val products = com.example.app.data.ProductRepository.products.collectAsState().value
-    val displayProducts = products.take(3) // Show first 3 products
-    
+private fun ProductCarousel(
+    products: List<com.example.app.product.Product>,
+    onProductClick: (String) -> Unit = {}
+) {
     LazyRow(horizontalArrangement = Arrangement.spacedBy(AppDimensions.SpacingL)) {
-        items(displayProducts) { product ->
+        items(products) { product ->
             ProductCardSmall(
                 title = product.name,
                 price = product.price,
                 productId = product.id,
                 category = product.category,
+                imageUrl = product.images.firstOrNull(),
                 stock = product.stock,
                 onClick = { onProductClick(product.name) }
             )
@@ -422,6 +490,7 @@ private fun ProductCardSmall(
     price: String,
     productId: String? = null,
     category: String? = null,
+    imageUrl: String? = null,
     stock: Int = 0,
     onClick: () -> Unit = {}
 ) {
@@ -443,6 +512,7 @@ private fun ProductCardSmall(
                 com.example.app.ui.ProductImage(
                     productId = productId,
                     category = category,
+                    imageUrl = imageUrl,
                     contentDescription = title,
                     modifier = Modifier.fillMaxSize()
                 )
@@ -626,38 +696,74 @@ fun BottomNavForRoot(
 }
 
 @Composable
-private fun PromotionBanner() {
+private fun PromotionBanner(
+    banner: com.example.app.data.model.Banner? = null,
+    onBannerClick: () -> Unit = {}
+) {
+    if (banner == null) return
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(160.dp),
+            .height(180.dp)
+            .clickable { onBannerClick() },
         shape = RoundedCornerShape(AppDimensions.RadiusL),
         colors = CardDefaults.cardColors(containerColor = AppColors.Primary)
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            // Background pattern or image could go here
+            // Background Image
+            if (!banner.imageUrl.isNullOrEmpty()) {
+                com.example.app.ui.ProductImage(
+                    productId = banner.productId,
+                    imageUrl = banner.imageUrl,
+                    contentDescription = banner.title,
+                    modifier = Modifier.fillMaxSize()
+                )
+                // Dark overlay for text readability
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black.copy(alpha = 0.5f))
+                )
+            }
+
             Column(
                 modifier = Modifier
                     .padding(AppDimensions.SpacingXXL)
                     .align(Alignment.CenterStart)
             ) {
                 Text(
-                    text = "Summer Sale",
-                    color = AppColors.TextOnPrimary.copy(alpha = 0.8f),
-                    fontSize = 14.sp,
+                    text = banner.title,
+                    color = Color.White.copy(alpha = 0.9f),
+                    fontSize = 16.sp,
                     fontWeight = FontWeight.Bold,
                     letterSpacing = 1.sp
                 )
                 Spacer(modifier = Modifier.height(AppDimensions.SpacingS))
-                Text(
-                    text = "50% OFF",
-                    color = AppColors.TextOnPrimary,
-                    fontSize = 32.sp,
-                    fontWeight = FontWeight.Black
-                )
+                
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    if (!banner.originalPrice.isNullOrEmpty()) {
+                        Text(
+                            text = banner.originalPrice,
+                            color = Color.White.copy(alpha = 0.7f),
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            textDecoration = TextDecoration.LineThrough
+                        )
+                        Spacer(modifier = Modifier.width(AppDimensions.SpacingM))
+                    }
+                    
+                    Text(
+                        text = banner.discount ?: "",
+                        color = Color.White,
+                        fontSize = 32.sp,
+                        fontWeight = FontWeight.Black
+                    )
+                }
+                
                 Spacer(modifier = Modifier.height(AppDimensions.SpacingM))
                 Button(
-                    onClick = { },
+                    onClick = onBannerClick,
                     colors = ButtonDefaults.buttonColors(containerColor = AppColors.Surface),
                     shape = RoundedCornerShape(AppDimensions.RadiusS),
                     contentPadding = PaddingValues(horizontal = AppDimensions.SpacingL, vertical = 0.dp),

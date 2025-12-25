@@ -129,6 +129,7 @@ private fun ProductCard(
                 com.example.app.ui.ProductImage(
                     productId = product.id,
                     category = product.category,
+                    imageUrl = product.images.firstOrNull(),
                     contentDescription = product.name,
                     modifier = Modifier.fillMaxSize()
                 )

@@ -12,8 +12,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.ShoppingCart
@@ -101,6 +103,7 @@ fun TrackOrderScreen(
             .padding(horizontal = AppDimensions.SpacingL)
             .padding(top = AppDimensions.SpacingL)
             .padding(bottom = AppDimensions.SpacingXXL)
+            .verticalScroll(rememberScrollState())
     ) {
         // Back button and order number
         Row(
@@ -263,6 +266,7 @@ private fun OrderItemsSection(
                                 com.example.app.ui.ProductImage(
                                     productId = item.productId,
                                     category = item.category,
+                                    imageUrl = item.imageUrl,
                                     contentDescription = item.productName,
                                     modifier = Modifier.fillMaxSize()
                                 )

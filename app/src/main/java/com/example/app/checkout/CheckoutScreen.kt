@@ -585,7 +585,7 @@ private fun BottomActionBar(
                         }
                     ),
                 colors = CardDefaults.cardColors(
-                    containerColor = if (isButtonEnabled) AppColors.PrimaryLight else AppColors.SurfaceVariant
+                    containerColor = if (isButtonEnabled) AppColors.Primary else AppColors.SurfaceVariant
                 )
             ) {
                 Text(
@@ -595,7 +595,7 @@ private fun BottomActionBar(
                         "Place Order",
                     modifier = Modifier.padding(horizontal = AppDimensions.SpacingXXXL, vertical = AppDimensions.SpacingL),
                     style = MaterialTheme.typography.titleMedium.copy(
-                        color = if (isButtonEnabled) AppColors.Primary else AppColors.TextTertiary,
+                        color = if (isButtonEnabled) AppColors.TextOnPrimary else AppColors.TextTertiary,
                         fontWeight = FontWeight.Bold
                     )
                 )

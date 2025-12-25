@@ -70,6 +70,10 @@ dependencies {
     implementation("androidx.activity:activity-compose:1.11.0")
     implementation("androidx.constraintlayout:constraintlayout-compose:1.0.1")
     
+    // Material 2 for PullRefresh (Material 3 version might be too old for stable PullToRefreshBox)
+    implementation("androidx.compose.material:material")
+
+    
     // Firebase
     implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
     implementation("com.google.firebase:firebase-firestore-ktx")

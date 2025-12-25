@@ -68,7 +68,8 @@ data class SearchProduct(
     val gender: String = "Men",
     val onSale: Boolean = false,
     val freeShipping: Boolean = false,
-    val stock: Int = 0
+    val stock: Int = 0,
+    val images: List<String> = emptyList()
 )
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -427,6 +428,7 @@ private fun ProductCard(product: SearchProduct) {
                 com.example.app.ui.ProductImage(
                     productId = product.id,
                     category = product.category,
+                    imageUrl = product.images.firstOrNull(),
                     contentDescription = product.name,
                     modifier = Modifier.fillMaxSize()
                 )

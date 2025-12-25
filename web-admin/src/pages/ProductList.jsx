@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import axios from 'axios';
-import { Edit2, Trash2, Search, Plus, AlertCircle, RefreshCw, Package } from 'lucide-react';
+import { Edit2, Trash2, Search, Plus, AlertCircle, RefreshCw, Package, Eye, EyeOff } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { auth } from '../config/firebase';
 
@@ -20,7 +20,7 @@ const ProductList = () => {
         setError(null);
         try {
             const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
-            const response = await axios.get(`${apiUrl}/api/products`);
+            const response = await axios.get(`${apiUrl}/api/products?includeHidden=true`);
             if (response.data && response.data.success) {
                 setProducts(Array.isArray(response.data.data) ? response.data.data : []);
             } else {
@@ -31,6 +31,27 @@ const ProductList = () => {
             setError("Connection error: " + err.message);
         } finally {
             setLoading(false);
+        }
+    };
+
+    const toggleVisibility = async (product) => {
+        if (!product || !product.id) return;
+        try {
+            const token = await auth.currentUser?.getIdToken();
+            const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+            const newHiddenStatus = !product.isHidden;
+
+            await axios.put(`${apiUrl}/api/products/${product.id}`,
+                { isHidden: newHiddenStatus },
+                { headers: { Authorization: `Bearer ${token}` } }
+            );
+
+            setProducts(products.map(p =>
+                p.id === product.id ? { ...p, isHidden: newHiddenStatus } : p
+            ));
+        } catch (error) {
+            console.error('Error toggling visibility:', error);
+            alert('Failed to update visibility: ' + (error.response?.data?.error || error.message));
         }
     };
 
@@ -73,6 +94,16 @@ const ProductList = () => {
     const getImage = (p) => {
         if (Array.isArray(p.images) && p.images.length > 0) return String(p.images[0]);
         if (p.imageUrl) return String(p.imageUrl);
+
+        // Local fallback based on category
+        const category = String(p.category || '').toLowerCase();
+        if (category.includes('hoodie')) return '/images/category_hoodies.jpg';
+        if (category.includes('jacket')) return '/images/category_jackets.jpg';
+        if (category.includes('t-shirt') || category.includes('tshirt')) return '/images/category_tshirts.jpg';
+        if (category.includes('pant')) return '/images/category_pants.jpg';
+        if (category.includes('shoe')) return '/images/category_shoes.jpg';
+        if (category.includes('accessories')) return '/images/category_accessories.jpg';
+
         return 'https://via.placeholder.com/40';
     };
 
@@ -159,7 +190,8 @@ const ProductList = () => {
                                             style={{
                                                 borderBottom: '1px solid var(--border)',
                                                 transition: 'all 0.3s ease',
-                                                background: 'transparent'
+                                                background: 'transparent',
+                                                opacity: p?.isHidden ? 0.6 : 1
                                             }}
                                             onMouseEnter={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.02)'}
                                             onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}
@@ -176,6 +208,17 @@ const ProductList = () => {
                                                     </div>
                                                     <span style={{ fontWeight: '700', fontSize: '1.1rem', color: 'var(--text-main)' }}>
                                                         {String(p?.name || 'Unnamed')}
+                                                        {p?.isHidden && (
+                                                            <span style={{
+                                                                marginLeft: '0.75rem',
+                                                                fontSize: '0.7rem',
+                                                                background: 'var(--danger)',
+                                                                color: 'white',
+                                                                padding: '0.2rem 0.5rem',
+                                                                borderRadius: '6px',
+                                                                textTransform: 'uppercase'
+                                                            }}>Hidden</span>
+                                                        )}
                                                     </span>
                                                 </div>
                                             </td>
@@ -210,6 +253,19 @@ const ProductList = () => {
                                             </td>
                                             <td style={{ padding: '1.25rem 2rem' }}>
                                                 <div style={{ display: 'flex', gap: '0.75rem' }}>
+                                                    <button
+                                                        onClick={() => toggleVisibility(p)}
+                                                        style={{
+                                                            background: p?.isHidden ? 'rgba(239, 68, 68, 0.05)' : 'rgba(16, 185, 129, 0.05)',
+                                                            color: p?.isHidden ? 'var(--danger)' : 'var(--accent)',
+                                                            padding: '0.6rem',
+                                                            borderRadius: '10px',
+                                                            border: '1px solid transparent'
+                                                        }}
+                                                        title={p?.isHidden ? "Show in App" : "Hide from App"}
+                                                    >
+                                                        {p?.isHidden ? <EyeOff size={20} /> : <Eye size={20} />}
+                                                    </button>
                                                     <button style={{
                                                         background: 'rgba(255,255,255,0.05)',
                                                         color: 'var(--text-muted)',

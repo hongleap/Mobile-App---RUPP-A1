@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import ProductList from './pages/ProductList';
 import AddProduct from './pages/AddProduct';
+import Banners from './pages/Banners';
 import AdminManagement from './pages/AdminManagement';
 import { auth } from './config/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -69,6 +70,7 @@ function App() {
           <Route path="/" element={<PrivateRoute><Dashboard /></PrivateRoute>} />
           <Route path="/products" element={<PrivateRoute><ProductList /></PrivateRoute>} />
           <Route path="/add-product" element={<PrivateRoute><AddProduct /></PrivateRoute>} />
+          <Route path="/banners" element={<PrivateRoute><Banners /></PrivateRoute>} />
           <Route path="/admins" element={<PrivateRoute><AdminManagement /></PrivateRoute>} />
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>

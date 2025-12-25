@@ -233,8 +233,8 @@ object TokenService {
             
             // Get current block number to limit search range
             val blockNumber = web3j.ethBlockNumber().send().blockNumber
-            // Look back ~5000 blocks (approx 4 hours on BSC) to be safe
-            val fromBlock = blockNumber.subtract(BigInteger.valueOf(5000))
+            // Look back ~1000 blocks (approx 50 minutes on BSC) - Safe with sender filter
+            val fromBlock = blockNumber.subtract(BigInteger.valueOf(1000))
             
             // Create filter for Transfer events
             val filter = org.web3j.protocol.core.methods.request.EthFilter(
@@ -244,8 +244,8 @@ object TokenService {
             )
             // Topic 0: Event Signature
             filter.addSingleTopic(eventSignature)
-            // Topic 1: From Address (Wildcard - fetch all, filter in code)
-            filter.addNullTopic()
+            // Topic 1: From Address (Filter by sender directly to reduce load)
+            filter.addSingleTopic(paddedFrom)
             // Topic 2: To Address
             filter.addSingleTopic(paddedTo)
             

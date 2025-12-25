@@ -1,38 +1,23 @@
 const express = require('express');
-const admin = require('firebase-admin');
+const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
-const fs = require('fs');
 require('dotenv').config();
+
+const Notification = require('./models/Notification');
 
 const app = express();
 const port = process.env.PORT || 8083;
 
-// Initialize Firebase Admin SDK
-const serviceAccountPath = './firebase-service-account.json';
-let db;
-
-if (fs.existsSync(serviceAccountPath)) {
-    try {
-        const serviceAccount = require(serviceAccountPath);
-
-        // Fix private key formatting if it contains literal \n
-        if (serviceAccount.private_key && serviceAccount.private_key.includes('\\n')) {
-            serviceAccount.private_key = serviceAccount.private_key.replace(/\\n/g, '\n');
-        }
-
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount)
-        });
-        db = admin.firestore();
-        console.log('Firebase Admin SDK initialized successfully');
-    } catch (error) {
-        console.error('WARNING: Failed to initialize Firebase:', error.message);
-    }
+// MongoDB Connection
+const mongodbUri = process.env.MONGODB_URI;
+if (mongodbUri) {
+    mongoose.connect(mongodbUri)
+        .then(() => console.log('Connected to MongoDB Atlas'))
+        .catch(err => console.error('MongoDB connection error:', err));
 } else {
-    console.warn('WARNING: firebase-service-account.json not found. Firebase operations will fail.');
+    console.warn('WARNING: MONGODB_URI not found. Database operations will fail.');
 }
-
 
 app.use(cors());
 app.use(express.json());
@@ -41,8 +26,9 @@ app.use(morgan('dev'));
 app.get('/', (req, res) => {
     res.json({
         service: 'Notification Service',
-        version: '1.0.0',
-        status: 'running'
+        version: '1.1.0',
+        status: 'running',
+        database: 'mongodb'
     });
 });
 
@@ -54,16 +40,7 @@ app.get('/api/notifications', async (req, res) => {
     }
 
     try {
-        const snapshot = await db.collection('notifications')
-            .where('userId', '==', userId)
-            .orderBy('createdAt', 'desc')
-            .get();
-
-        const notifications = snapshot.docs.map(doc => ({
-            id: doc.id,
-            ...doc.data()
-        }));
-
+        const notifications = await Notification.find({ userId }).sort({ createdAt: -1 });
         res.json({ success: true, data: notifications });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
@@ -78,19 +55,13 @@ app.post('/api/notifications', async (req, res) => {
     }
 
     try {
-        const notificationData = {
+        const notification = new Notification({
             userId,
             message,
-            isRead: false,
-            type: type || 'order',
-            createdAt: Date.now()
-        };
-
-        const docRef = await db.collection('notifications').add(notificationData);
-        res.status(201).json({
-            success: true,
-            data: { id: docRef.id, ...notificationData }
+            type: type || 'order'
         });
+        await notification.save();
+        res.status(201).json({ success: true, data: notification });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -99,8 +70,11 @@ app.post('/api/notifications', async (req, res) => {
 // Mark notification as read
 app.put('/api/notifications/:id/read', async (req, res) => {
     try {
-        await db.collection('notifications').doc(req.params.id).update({ isRead: true });
-        res.json({ success: true, message: 'Notification marked as read' });
+        const notification = await Notification.findByIdAndUpdate(req.params.id, { isRead: true }, { new: true });
+        if (!notification) {
+            return res.status(404).json({ success: false, error: 'Notification not found' });
+        }
+        res.json({ success: true, message: 'Notification marked as read', data: notification });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
@@ -114,17 +88,7 @@ app.put('/api/notifications/mark-all-read', async (req, res) => {
     }
 
     try {
-        const snapshot = await db.collection('notifications')
-            .where('userId', '==', userId)
-            .where('isRead', '==', false)
-            .get();
-
-        const batch = db.batch();
-        snapshot.docs.forEach(doc => {
-            batch.update(doc.ref, { isRead: true });
-        });
-        await batch.commit();
-
+        await Notification.updateMany({ userId, isRead: false }, { isRead: true });
         res.json({ success: true, message: 'All notifications marked as read' });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });

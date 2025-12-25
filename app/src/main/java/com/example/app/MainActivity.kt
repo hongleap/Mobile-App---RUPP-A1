@@ -209,6 +209,9 @@ fun MainScreen() {
     
     // Product page state
     var selectedProduct by remember { mutableStateOf<Product?>(null) }
+    
+    // Orders refresh state
+    var isRefreshingOrders by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Login screens
@@ -325,6 +328,23 @@ fun MainScreen() {
                                 currentScreen = "product_page"
                             }
                         },
+                        onBannerClick = { banner ->
+                            // Find product by ID first, then by name
+                            val product = if (!banner.productId.isNullOrEmpty()) {
+                                ProductRepository.products.value.find { it.id == banner.productId }
+                            } else {
+                                ProductRepository.products.value.find { it.name == banner.title }
+                            }
+                            
+                            if (product != null) {
+                                // Create a copy of the product with banner prices
+                                selectedProduct = product.copy(
+                                    price = banner.discount ?: product.price,
+                                    originalPrice = banner.originalPrice ?: product.price
+                                )
+                                currentScreen = "product_page"
+                            }
+                        },
                         onSearchSubmit = { q ->
                             searchQuery = q
                             searchResults = if (q.isNotEmpty()) {
@@ -348,6 +368,17 @@ fun MainScreen() {
                 ) {
                     OrdersScreen(
                         orders = orders,
+                        isRefreshing = isRefreshingOrders,
+                        onRefresh = {
+                            scope.launch {
+                                isRefreshingOrders = true
+                                val result = OrderRepository.getOrders()
+                                result.onSuccess { newOrders ->
+                                    orders = newOrders
+                                }
+                                isRefreshingOrders = false
+                            }
+                        },
                         onOrderClick = { orderId ->
                             selectedOrderId = orderId
                             currentScreen = "track_order"
@@ -576,7 +607,9 @@ fun MainScreen() {
                             price = price,
                             quantity = quantity,
                             size = size,
-                            color = color
+                            color = color,
+                            category = product.category,
+                            imageUrl = product.images.firstOrNull()
                         )
                         cartItems = cartItems + newItem
                         currentScreen = "cart"
@@ -726,7 +759,8 @@ fun MainScreen() {
                                 price = item.price,
                                 size = item.size,
                                 color = item.color,
-                                category = item.category
+                                category = item.category,
+                                imageUrl = item.imageUrl
                             )
                         }
                         val orderSubtotal = cartItems.sumOf { it.price * it.quantity }
@@ -770,14 +804,15 @@ fun MainScreen() {
                                         com.example.app.blockchain.PaymentVerification.markTransactionAsConsumed(context, txHash, totalAmount)
                                     }
                                     com.example.app.blockchain.PaymentVerification.clearPendingPayment(context)
-                                    paymentVerified = false
+                                    com.example.app.blockchain.PaymentVerification.clearPendingPayment(context)
+                                    // paymentVerified = false // Moved to after navigation to prevent UI glitch
                                 }
                             }
                             
                             // Decrease stock for all products in the order
                             val stockResult = StockRepository.decreaseStockForOrder(orderItems)
                             stockResult.onFailure {
-                                println("Error decreasing stock: ${it.message}")
+                                // Log.e("MainActivity", "Error decreasing stock: ${it.message}")
                                 // Continue even if stock update fails
                             }
                             
@@ -796,21 +831,29 @@ fun MainScreen() {
                             cartItems = emptyList()
                             
                             // Wait a bit for database write to complete, then reload orders
-                            kotlinx.coroutines.delay(500)
+                            kotlinx.coroutines.delay(1000) // Increased to 1s to ensure DB consistency
+
                             val ordersResult = OrderRepository.getOrders()
                             ordersResult.onSuccess {
+
                                 orders = it
                             }.onFailure {
+
                                 // If reload fails, still try to reload when user navigates to orders screen
                             }
                             
                             // Navigate to order placed screen
                             currentScreen = "order_placed"
+                            
+                            // Reset payment verification AFTER navigating away to avoid UI glitch
+                            if (selectedPaymentType == "token") {
+                                paymentVerified = false
+                            }
                         }.onFailure { exception ->
-                            // Handle error - could show error message
-                            println("Error creating order: ${exception.message}")
-                            // For now, still navigate to order placed screen
-                            currentScreen = "order_placed"
+                            // Handle error - show error message and DO NOT navigate
+                            // Log.e("MainActivity", "Error creating order: ${exception.message}")
+                            errorMessage = "Failed to place order: ${exception.message}"
+                            // Do NOT navigate to order_placed on failure
                         }
                     }
                 }

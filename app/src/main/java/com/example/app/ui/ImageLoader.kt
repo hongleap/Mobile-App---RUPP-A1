@@ -12,6 +12,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import coil.compose.AsyncImage
 
 /**
  * Get category image name from category string
@@ -76,28 +77,43 @@ private fun getImageResourceId(
     return resourceId
 }
 
+
 /**
- * Product image loader that loads from local resources
- * Uses product ID to find image (e.g., "HO1" -> ho1.png)
- * Falls back to category image (e.g., "Shoes" -> shoes.png) if product image not found
- * Falls back to Product.png if category image not found
+ * Product image loader that loads from remote URL or local resources
+ * 1. Tries to load from imageUrl if provided
+ * 2. Falls back to local resource with name matching productId
+ * 3. Falls back to category image
+ * 4. Falls back to "product" placeholder
  */
 @Composable
 fun ProductImage(
     productId: String?,
     category: String? = null,
+    imageUrl: String? = null,
     contentDescription: String? = null,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val resourceId = getImageResourceId(context, productId, category)
+    val fallbackResourceId = getImageResourceId(context, productId, category)
     
-    Image(
-        painter = painterResource(id = resourceId),
-        contentDescription = contentDescription,
-        modifier = modifier
-            .clip(RoundedCornerShape(12.dp)),
-        contentScale = ContentScale.Crop
-    )
+    if (!imageUrl.isNullOrEmpty()) {
+        AsyncImage(
+            model = imageUrl,
+            contentDescription = contentDescription,
+            modifier = modifier
+                .clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop,
+            error = painterResource(id = fallbackResourceId),
+            placeholder = painterResource(id = fallbackResourceId)
+        )
+    } else {
+        Image(
+            painter = painterResource(id = fallbackResourceId),
+            contentDescription = contentDescription,
+            modifier = modifier
+                .clip(RoundedCornerShape(12.dp)),
+            contentScale = ContentScale.Crop
+        )
+    }
 }
 

@@ -23,7 +23,8 @@ data class OrderItem(
     val price: Double = 0.0,
     val size: String? = null,
     val color: String? = null,
-    val category: String? = null
+    val category: String? = null,
+    val imageUrl: String? = null
 )
 
 object OrderRepository {
