@@ -59,14 +59,18 @@ graph TD
     A[Android App] -->|HTTP/JSON| B[API Gateway :8080]
     C[React Admin] -->|HTTP/JSON| B
     
+    A -->|Auth| FA[Firebase Authentication]
+    C -->|Auth| FA
+    
     subgraph "Backend (Docker)"
+    B -->|Verify Token| FA
     B --> D[Product Service :9091]
     B --> E[Order Service :8092]
     B --> F[Notification Service :9093]
     B --> G[Transaction Service :9094]
     end
     
-    D & E & F & G --> H[(Firebase Firestore)]
+    D & E & F & G --> H[(MongoDB Atlas)]
     G --> I[Ethereum/BSC Blockchain]
 ```
 
